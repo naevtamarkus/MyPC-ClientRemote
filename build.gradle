@@ -1,0 +1,28 @@
+plugins {
+  id 'com.github.johnrengelman.shadow' version '5.0.0'
+  id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies{
+    compile 'com.dorkbox:SystemTray:3.17'
+}
+
+sourceSets {
+    main.java.srcDirs = ['java']
+    main.resources.srcDirs = ['res']
+}
+
+tasks.withType(Jar) {
+    destinationDir = file("$rootDir")
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'mypc.clientremote.ClientRemote'
+    }
+}
+
