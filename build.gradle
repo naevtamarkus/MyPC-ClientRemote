@@ -18,6 +18,7 @@ sourceSets {
 
 tasks.withType(Jar) {
     destinationDir = file("$rootDir")
+    archiveFileName = "clientremote.jar"
 }
 
 jar {

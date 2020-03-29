@@ -1,2 +1,2 @@
 #!/bin/bash
-gradle shadowJar
+./gradlew shadowJar
