@@ -1,5 +1,6 @@
 plugins {
   id 'com.github.johnrengelman.shadow' version '5.0.0'
+  id 'edu.sc.seis.launch4j' version '2.4.6'
   id 'java'
 }
 
@@ -18,12 +19,26 @@ sourceSets {
 
 tasks.withType(Jar) {
     destinationDir = file("$rootDir")
-    archiveFileName = "clientremote.jar"
+    archiveFileName = "MyPCClientRemote.jar"
 }
 
+//RUN   ./gradlew shadow
 jar {
     manifest {
         attributes 'Main-Class': 'mypc.clientremote.ClientRemote'
     }
+}
+
+//RUN:   ./gradlew createExe
+launch4j {
+    jar = "${projectDir}/MyPCClientRemote.jar"
+    mainClassName = 'mypc.clientremote.ClientRemote'
+    icon = "${projectDir}/res/MyPC-icon_64x64.ico"
+    outfile = "MyPCClientRemote.exe"
+    copy {
+        from "${buildDir}/${outputDir}"
+        into "${projectDir}"
+        include 'MyPCClientRemote.exe'
+    }   
 }
 
