@@ -10,9 +10,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,18 +17,57 @@ import java.util.concurrent.TimeUnit;
 
 import static mypc.clientremote.ClientRemote.debug;
 
+/*
+    ##### USAGE EXAMPLE #####
+    
+    NetworkScanner scanner = new NetworkScanner();
+
+    // Add hosts/networks to scan (as many as you want)
+    scanner.addIpAddress("127.0.0.1"); // individual IP
+    scanner.addAllTypeCNetworksAvailable(); // multiple IPs
+    // Optionally add ports to scan (if no ports are added, it does ICMP Ping)
+    scanner.addPort(50505); // individual port
+    scanner.addPortRange(1, 200); // multiple ports
+    // Optionally, tell the scanner to stop after the first success
+    scanner.setStopAfterFound(true);    
+        
+    // Define callback when scan is finished (even if stopped/cancelled):
+    scanner.setOnFinishCallback(new NetworkScanner.onFinishCallback(){
+        @Override
+        public void onFinish() {
+            debug("Scan finished, " + scanner.getHitResults().size() + " found");                
+        }
+    });
+    
+    // Define callback when something is found:
+    scanner.setOnFoundCallback(new NetworkScanner.onFoundCallback(){        
+        @Override
+        public void onFound(String ip, int port) {
+            debug ("Found " + ip + ":" + port);
+        }
+    });
+
+    // Start scan (asynchronously)
+    scanner.start();
+
+    // Check status
+    if (scanner.isScanning()) debug ("is scanning!")
+    // Cancel
+    scanner.cancel();
+    
+    // Check below for other public methods
+
+*/
+
 class NetworkScanner {
     // https://stackoverflow.com/questions/11547082/fastest-way-to-scan-ports-with-java
 
-    //private boolean onlyPing; // Wether it's enough to do ping or we need sockets and ports
     private boolean stopAfterFound; // whether to stop scan after first found 
-    //private boolean cancel; // Give the possibility that someone cancels the search
     private List<Integer> portsToScan; // List wit the ports to scan. Can be empty
     private List<String> ipsToScan; // List with IPs to scan. 
     private int timeout; // Connection/ping timeout, in miliseconds
     private List<Future<ScanResult>> results; // Pairs IP-port for all entries (open and close)
     private int threadPoolSize;
-    //private ExecutorService executor;
     private ThreadPoolExecutor executor;
     private BlockingQueue<Runnable> jobQueue;
 
@@ -39,6 +75,7 @@ class NetworkScanner {
     private onFinishCallback onFinishCallback;
     private onFoundCallback onFoundCallback;
 
+    // Callback interfaces
     public interface onFoundCallback {
         public void onFound(String ip, int port);
     }
@@ -46,17 +83,22 @@ class NetworkScanner {
         public void onFinish();
     }
 
+    // Constructor
     public NetworkScanner() {
         // Init with defaults
         //onlyPing = true; // replaced by portsToScan.size() = 0;
-        stopAfterFound = false;
+        this.stopAfterFound = false;
         //cancel = false;
-        timeout = 200;
-        threadPoolSize = 20;
-        portsToScan = new ArrayList<>();
-        ipsToScan = new ArrayList<>();
-        results = new ArrayList<>();
+        this.timeout = 200;
+        this.threadPoolSize = 20;
+        this.portsToScan = new ArrayList<>();
+        this.ipsToScan = new ArrayList<>();
+        this.results = new ArrayList<>();
     }
+
+    // #######################
+    //      PUBLIC METHODS
+    // #######################
 
     public void setOnFinishCallback(onFinishCallback cb) {
         this.onFinishCallback = cb;
@@ -90,17 +132,15 @@ class NetworkScanner {
                 bytes[3] = (byte)i; 
                 InetAddress address = InetAddress.getByAddress(bytes);
                 String candidate = address.toString().substring(1);
-                ipsToScan.add(candidate);
+                this.ipsToScan.add(candidate);
             }
         } catch (Exception e) {
-
         }
     }
 
-    public void addAllTypeCNetworks() {
+    public void addAllTypeCNetworksAvailable() {
         try {
             Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
-            //for (int networkInterfaceNumber = 0; en.hasMoreElements(); networkInterfaceNumber++) {
             for (;en.hasMoreElements();) {
                 NetworkInterface intf = en.nextElement();
                 List<InterfaceAddress> enumIfaceAddr = intf.getInterfaceAddresses();
@@ -114,65 +154,58 @@ class NetworkScanner {
         } catch (Exception e) {
             debug(e.getMessage());
         }
-
     }
 
     public void addPort(int port) {
-        portsToScan.add(port);
+        this.portsToScan.add(port);
     }
 
     public void addPortRange(int first, int last) {
         if (last < first) return;
         for (int i = first; i<=last; i++) {
-            portsToScan.add(i);
+            this.portsToScan.add(i);
         }
     }
 
     public void setStopAfterFound(boolean val) {
-        stopAfterFound = val;
+        this.stopAfterFound = val;
     }
 
     public void setTimeout(int millis) {
-        timeout = millis;
+        this.timeout = millis;
     }
 
     public void setThreadPoolSize(int size) {
-        threadPoolSize = size;
+        this.threadPoolSize = size;
     }
 
     // Returns the size of the search
     // This is a non-blocking call
     public int start() {
-        results = new ArrayList<>(); // Reset results, in case they call 'start()' twice
+        this.results = new ArrayList<>(); // Reset results, in case they call 'start()' twice
         //executor = Executors.newFixedThreadPool(threadPoolSize);
-        jobQueue = new LinkedBlockingQueue<Runnable>();
-        executor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 0L, 
+        this.jobQueue = new LinkedBlockingQueue<Runnable>();
+        this.executor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 0L, 
                                           TimeUnit.MILLISECONDS, jobQueue);
-        for (String ip: ipsToScan) {
+        for (String ip: this.ipsToScan) {
             // Check if there are ports to scan
-            if (portsToScan.size() > 0) {
-                for (int port: portsToScan) {
-                    results.add(portIsOpen(ip, port, timeout));
+            if (this.portsToScan.size() > 0) {
+                for (int port: this.portsToScan) {
+                    this.results.add(portIsOpen(ip, port, this.timeout));
                 }
             } else {
                 // Otherwise just ping
-                results.add(hostIsUp(ip, timeout));
+                this.results.add(hostIsUp(ip, this.timeout));
             }
         }
-
         // Don't accept more tasks, but finish what got in
-        executor.shutdown(); 
-
+        this.executor.shutdown(); 
         // Launch a background task to call the callback when it's finished
         if (onFinishCallback != null) {
             new Thread(new Runnable(){
                 @Override
                 public void run() {
-                    int deciSeconds = 10*3600*24; // wait 24 hours max
-                    while (deciSeconds > 0 && isScanning()) {
-                        deciSeconds--;
-                        try { Thread.sleep(100); } catch (Exception e) {}
-                    }
+                    waitForCompletion();
                     onFinishCallback.onFinish(); // we already checked != null
                     /*
                     try {
@@ -185,34 +218,46 @@ class NetworkScanner {
                 }
             }).start();
         }
-        return results.size();
+        return this.results.size();
     }
 
     public void cancel() {
         // Gracefully stop jobs from flowing
-        debug("Stopping scan. Pending jobs: "+executor.getActiveCount());
-        if (jobQueue != null) jobQueue.clear();
+        debug("Stopping scan. Pending jobs: " + this.executor.getActiveCount());
+        if (this.jobQueue != null) this.jobQueue.clear();
     }
 
     public void cancelForced() {
-        if (executor != null) executor.shutdownNow();
+        // TODO this was never properly tested
+        if (this.executor != null) this.executor.shutdownNow();
     }
 
     public long countCompleted() {
-        if (executor != null) {
-            return executor.getCompletedTaskCount();            
+        if (this.executor != null) {
+            return this.executor.getCompletedTaskCount();            
         } else {
             return 0;
         }
     }
 
     public boolean isScanning() {
-        // TODO this is probably wrong, CHECK!
-        return executor != null && executor.getActiveCount() > 0;
+        return this.executor != null && this.executor.getActiveCount() > 0;
     }
 
-    public Future<ScanResult> portIsOpen(final String ip, final int port, final int timeout) {
-        return executor.submit(new Callable<ScanResult>() {
+    public void waitForCompletion() {
+        int deciSeconds = 10*3600*24; // wait 24 hours max
+        while (deciSeconds > 0 && this.isScanning()) {
+            deciSeconds--;
+            try { Thread.sleep(100); } catch (Exception e) {}
+        }
+    }
+
+    // #######################
+    //      PRIVATE METHODS
+    // #######################
+
+    private Future<ScanResult> portIsOpen(final String ip, final int port, final int timeout) {
+        return this.executor.submit(new Callable<ScanResult>() {
             @Override
             public ScanResult call() {
                 try {
@@ -231,7 +276,7 @@ class NetworkScanner {
         });
     }
 
-    public Future<ScanResult> hostIsUp(final String ip, final int timeout) {
+    private Future<ScanResult> hostIsUp(final String ip, final int timeout) {
         return executor.submit(new Callable<ScanResult>() {
             @Override
             public ScanResult call() {
@@ -250,17 +295,13 @@ class NetworkScanner {
         });
     }
 
-    public void waitForCompletion() {
-        try {
-            executor.awaitTermination(500L, TimeUnit.HOURS);
-        } catch (Exception e){
-            // nothing
-        }
-    }
+    // #######################
+    //      RESULTS CLASS
+    // #######################
 
     public List<ScanResult> getAllResults() {
         List<ScanResult> output = new ArrayList<>();
-        for (Future<ScanResult> item : results) {
+        for (Future<ScanResult> item : this.results) {
             try {
                 output.add(item.get()); // This can throw a couple of exceptions
             } catch (Exception e) {
@@ -273,14 +314,14 @@ class NetworkScanner {
     public List<ScanResult> getHitResults() {
         List<ScanResult> output = new ArrayList<>();
         ScanResult tmp;
-        for (Future<ScanResult> item : results) {
+        for (Future<ScanResult> item : this.results) {
             try {
                 if (! item.isDone()) continue; // Ignore if the future is not done, otherwise blocks call
                 tmp = item.get();
                 if (tmp.isHit()) output.add(tmp); // This can throw a couple of exceptions
             } catch (Exception e) {
                 // If there was an error, just dump the result
-                debug ("problem");
+                debug("problem");
             }
         }
         return output;
@@ -310,6 +351,7 @@ class NetworkScanner {
         }
     }
 
+    // This just shows local networks, helper function
     public static void debugNetworks() {
         try {
             Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
@@ -326,6 +368,5 @@ class NetworkScanner {
         } catch (Exception e) {
             debug(e.getMessage());
         }
-
     }
 }
