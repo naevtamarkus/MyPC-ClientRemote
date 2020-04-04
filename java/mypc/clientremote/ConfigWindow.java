@@ -172,7 +172,7 @@ public class ConfigWindow extends JFrame {
         scanner = new NetworkScanner();
         //scanner.addFullNetworkFromIPTypeC("192.168.43.116");
         scanner.addIpAddress("127.0.0.1");
-        scanner.addAllTypeCNetworks();
+        scanner.addAllTypeCNetworksAvailable();
         scanner.addPort(50505);
         //scanner.addPortRange(1, 200);
         scanner.setStopAfterFound(true);    
