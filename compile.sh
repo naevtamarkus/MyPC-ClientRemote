@@ -1,2 +1,2 @@
 #!/bin/bash
-./gradlew shadowJar
+./gradlew shadowJar && ./gradlew createExe

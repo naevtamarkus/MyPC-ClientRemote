@@ -31,6 +31,7 @@ jar {
 
 //RUN:   ./gradlew createExe
 launch4j {
+    //copyConfigurable = project.tasks.shadowJar.outputs.files
     jar = "${projectDir}/MyPCClientRemote.jar"
     mainClassName = 'mypc.clientremote.ClientRemote'
     icon = "${projectDir}/res/MyPC-icon_64x64.ico"

@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
@@ -34,6 +35,9 @@ public class ConfigWindow extends JFrame {
     private static JButton butTest;
     private static JTextField txtIp;
     private static Config config;
+    private static JButton butScan;
+
+    private static NetworkScanner scanner; 
 
     // Windows should go into separate threads
     public static void display() {
@@ -74,7 +78,7 @@ public class ConfigWindow extends JFrame {
         mainPanel.add(panel3);
 
         // Network Scan button
-        JButton butScan = new JButton("Scan local network");
+        butScan = new JButton("Scan local network");
         panel1.add(butScan);
 
         // IP address setting & test button
@@ -102,15 +106,33 @@ public class ConfigWindow extends JFrame {
         butScan.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                labelStatus.setText("Searching, please wait");
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Somehow running the scanner seems to interact with the drawing of the widgets
-                        // Running it from a separate thread later seems to do the trick (not sure why, though)
-                        scanNetwork(); 
-                    }
-                });
+                if (scanner != null && scanner.isScanning()) {
+                    // If scanning, stop. Set the buttons to start again
+                    labelStatus.setText("Stopping search..."); // onFinish() should replace it later
+                    butScan.setText("Scan local network");
+                    scanner.cancel();
+                    //SwingUtilities.invokeLater(new Runnable() {
+                    //    @Override
+                    //    public void run() {
+                    //        // Somehow running the scanner seems to interact with the drawing of the widgets
+                    //        // Running it from a separate thread later seems to do the trick (not sure why, though)
+                    //        scanner.cancel(); 
+                    //    }
+                    //});
+                } else {
+                    // If not scanning, start. Set the buttons to stop.
+                    labelStatus.setText("Searching, please wait");
+                    butScan.setText("Stop Scan");
+                    startNetworkScan();
+                    //SwingUtilities.invokeLater(new Runnable() {
+                    //    @Override
+                    //    public void run() {
+                    //        // Somehow running the scanner seems to interact with the drawing of the widgets
+                    //        // Running it from a separate thread later seems to do the trick (not sure why, though)
+                    //        startNetworkScan(); 
+                    //    }
+                    //});
+                }
             }
         });
 
@@ -145,13 +167,13 @@ public class ConfigWindow extends JFrame {
         }
     }
 
-    private static void scanNetwork() {
+    private static void startNetworkScan() {
         debug("Scanning local network");
-        NetworkScanner scanner = new NetworkScanner();
+        scanner = new NetworkScanner();
         //scanner.addFullNetworkFromIPTypeC("192.168.43.116");
+        scanner.addIpAddress("127.0.0.1");
         scanner.addAllTypeCNetworks();
-        //scanner.addPort(50505);
-        //scanner.addIpAddress("127.0.0.1");
+        scanner.addPort(50505);
         //scanner.addPortRange(1, 200);
         scanner.setStopAfterFound(true);    
         
@@ -162,6 +184,7 @@ public class ConfigWindow extends JFrame {
                 //int count = 0;
                 debug("Scan finished, "+count+" found");                
                 currentWindow.labelStatus.setText("Scan finished, "+count+" found");
+                butScan.setText("Scan local network");
             }
         });
         
@@ -170,60 +193,23 @@ public class ConfigWindow extends JFrame {
             public void onFound(String ip, int port) {
                 debug (" found "+ip+":"+port);
                 // TODO enable this after doing tests
-                //txtIp.setText(ip);
+                currentWindow.labelStatus.setText("Found: "+ip);
+                txtIp.setText(""); // We seem to have problems resetting the field, we blank if first
+                txtIp.setText(ip);
                 //butTest.doClick();
             }
         });
+
         scanner.start();
+        /*
+        SwingWorker worker = new SwingWorker<Integer, Integer>() {
+            @Override
+            public Integer doInBackground() {
+                return scanner.start();
+            }
+        };
+        */
     }
 
-    /*
-    private static void scanNetworkOld() {
-        debug("Scanning local network");
-        InetAddress localhost;
-        try {
-            localhost = InetAddress.getLocalHost();
-        } catch (Exception e) {
-            currentWindow.labelStatus.setText("Error: no local network");
-            return;
-        }
-        byte[] ip = localhost.getAddress();
-        ConnectionService conn = ConnectionService.getInstance();
-        //List<String> candidates = new ArrayList<>();
 
-        // TODO we can only cover TypeC networks here, can do better!
-        // TODO we should probably make 4-5 threads to scan the whole range faster
-        for (int i = 1; i <= 254; i++) {
-            try {
-                ip[3] = (byte)i; 
-                InetAddress address = InetAddress.getByAddress(ip);
-                String candidate = address.toString().substring(1);
-
-                if (address.isReachable(50)) {
-                    //candidates.add(address.toString().substring(1));
-                    debug(candidate + " is on the network");
-                    // Check if the found host responds to the right port
-                    if (conn.testHost(candidate, 300)) {
-                        debug("Found MyPC: "+candidate);
-                        txtIp.setText(candidate);
-                        butTest.doClick();
-                        return;
-                    }
-                        
-                }
-            } catch (Exception e) {
-            }
-        }
-        currentWindow.labelStatus.setText("Not found");
-
-        for (String candidate: candidates) {
-            if (conn.testHost(candidate, 300)) {
-                currentWindow.labelStatus.setText("Found "+candidate);
-                txtIp.setText(candidate);
-                butTest.doClick();
-            }
-        }
-
-    }
-    */
 }
