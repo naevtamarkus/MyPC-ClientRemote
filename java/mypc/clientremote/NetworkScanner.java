@@ -51,10 +51,11 @@ import static mypc.clientremote.ClientRemote.debug;
     scanner.start();
 
     // Check status
-    if (scanner.isScanning()) debug ("is scanning!")
+    if (scanner.isScanning()) debug ("is scanning!");
     // Cancel
     scanner.cancel();
-    
+    // Get scan results:
+    List<ScanResult> results = getAllResults();
     // Check below for other public methods
 
 */
@@ -135,6 +136,7 @@ class NetworkScanner {
                 this.ipsToScan.add(candidate);
             }
         } catch (Exception e) {
+            debug(e.getMessage());
         }
     }
 
@@ -248,7 +250,11 @@ class NetworkScanner {
         int deciSeconds = 10*3600*24; // wait 24 hours max
         while (deciSeconds > 0 && this.isScanning()) {
             deciSeconds--;
-            try { Thread.sleep(100); } catch (Exception e) {}
+            try { 
+                Thread.sleep(100); 
+            } catch (Exception e) {
+                debug(e.getMessage());
+            }
         }
     }
 
@@ -303,9 +309,11 @@ class NetworkScanner {
         List<ScanResult> output = new ArrayList<>();
         for (Future<ScanResult> item : this.results) {
             try {
+                if (! item.isDone()) continue; // Ignore if the future is not done, otherwise blocks call
                 output.add(item.get()); // This can throw a couple of exceptions
             } catch (Exception e) {
                 // If there was an error, just dump the result
+                debug(e.getMessage());
             }
         }
         return output;
@@ -321,7 +329,7 @@ class NetworkScanner {
                 if (tmp.isHit()) output.add(tmp); // This can throw a couple of exceptions
             } catch (Exception e) {
                 // If there was an error, just dump the result
-                debug("problem");
+                debug(e.getMessage());
             }
         }
         return output;
