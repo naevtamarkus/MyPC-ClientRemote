@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,6 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+
 
 import static mypc.clientremote.ClientRemote.debug;
 
@@ -70,12 +74,16 @@ public class ConfigWindow extends JFrame {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         setContentPane(mainPanel);
         // Add panels
-        JPanel panel1 = new JPanel(new FlowLayout());
-        JPanel panel2 = new JPanel(new FlowLayout());
-        JPanel panel3 = new JPanel(new FlowLayout());
+        JPanel panel1 = new JPanel(new FlowLayout());  // for scan button
+        JPanel panel2 = new JPanel(new FlowLayout());  // for IP textfield and test button
+        JPanel panel3 = new JPanel(new FlowLayout());  // for scan status txt
+        JPanel panel4 = new JPanel(new FlowLayout());  // for connectOnStart checkbox
+        JPanel panel5 = new JPanel(new FlowLayout());  // for delayKeys checkbox
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(panel3);
+        mainPanel.add(panel4);
+        mainPanel.add(panel5);
 
         // Network Scan button
         butScan = new JButton("Scan local network");
@@ -140,7 +148,26 @@ public class ConfigWindow extends JFrame {
         labelStatus = new JLabel(""); 
         panel3.add(labelStatus);
 
-        // Allow it to close
+        // ConnectOnStart checkbox
+        JCheckBox cbCOS = new JCheckBox("Connect on Start");
+        panel4.add(cbCOS);
+        cbCOS.addItemListener(new ItemListener() {    
+            public void itemStateChanged(ItemEvent e) {     
+                config.setConnectOnStart(e.getStateChange() == 1);
+                debug("Setting: "+config.getConnectOnStart());
+            }    
+        });    
+
+        JCheckBox cbCOS2 = new JCheckBox("Connect on Start");
+        panel5.add(cbCOS);
+        cbCOS2.addItemListener(new ItemListener() {    
+            public void itemStateChanged(ItemEvent e) {     
+                config.setConnectOnStart(e.getStateChange() == 1);
+                debug("Setting: "+config.getConnectOnStart());
+            }    
+        });    
+
+        // Allow the window to close (without closing the app)
         //setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {  
