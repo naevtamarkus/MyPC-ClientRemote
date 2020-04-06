@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import dorkbox.util.Desktop;
+
+import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 
 public class UpdateWindow extends JFrame {
@@ -81,7 +83,7 @@ public class UpdateWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Desktop.browseURL("https://mypc-app.web.app/"); 
+                    Desktop.browseURL(URL_WEBSITE);
                 } catch (IOException e1) {
                     debug(Arrays.toString(e1.getStackTrace()));
                 }

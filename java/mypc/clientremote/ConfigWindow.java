@@ -22,6 +22,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import static mypc.clientremote.ClientRemote.EMAIL;
+import static mypc.clientremote.ClientRemote.URL_EMAIL;
+import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 
 public class ConfigWindow extends JFrame {
@@ -185,10 +188,10 @@ public class ConfigWindow extends JFrame {
         });
 
         panel6.add(new JLabel("Send feedback to: "));
-        panel6.add(new JHyperlink("naevtamarkus@gmail.com", "mailto:naevtamarkus@gmail.com"));
+        panel6.add(new JHyperlink(EMAIL, URL_EMAIL));
 
         panel7.add(new JLabel("MyPC App website: "));
-        panel7.add(new JHyperlink("https://mypc-app.web.app/", "https://mypc-app.web.app/"));
+        panel7.add(new JHyperlink(URL_WEBSITE, URL_WEBSITE));
 
         // Allow the window to close (without closing the app)
         // setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
