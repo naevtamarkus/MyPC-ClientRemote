@@ -131,17 +131,13 @@ public class ConnectionService {
                                 // Don't process message anymore
                                 continue;
                             }
-                            // Hit the key in the local PC
-                            String msgType = st.split(" ")[0];
-                            String msgContent = st.split(" ",2)[1];
-                            if (msgType.equals("S")) {
-                                processKey(msgContent, KeyMap.KeyType.SHORT);
-                            } else if (msgType.equals("L")) {
-                                processKey(msgContent, KeyMap.KeyType.LONG);
-                            } else if (msgType.equals("I")) {
-                                processInfoMessage(msgContent);
+                            Message message = new Message(st);
+                            if (message.isKey()) {
+                                processKey(message.getKeyType(), message.getKeyCode());
+                            } else if (message.isInfo()) {
+                                processInfoMessage(message.getInfo());
                             } else {
-                                debug ("Unknown message");
+                                debug ("  unknown message");
                             }
                         }
                         //Close connection 
@@ -173,8 +169,13 @@ public class ConnectionService {
                         debug(Arrays.toString(e.getStackTrace()));
                     }
                     // We can recover, just try again
-                    if (connectionChangeEvent != null && status != Status.RECONNECTING) connectionChangeEvent.onConnectionChanged();
-                    status = Status.RECONNECTING;
+                    if (connectionChangeEvent != null && status != Status.RECONNECTING) {
+                        // We only notify the first time
+                        status = Status.RECONNECTING;
+                        connectionChangeEvent.onConnectionChanged();
+                    } else {
+                        status = Status.RECONNECTING;
+                    }
                     debug("ConnectionService: client disconnected. Trying to reconnect");
 
                     // Wait 5 seconds before connecting again
@@ -190,14 +191,13 @@ public class ConnectionService {
         // TODO handle more unrecoverable errors (and change connection status)
     }
 
-    private void processKey(String message, KeyMap.KeyType type) {
-        int keyCodeAndroid = Integer.parseInt(message);
-        KeyCombination keyCombo = keyMap.getKey(type, keyCodeAndroid);
+    private void processKey(KeyMap.KeyType type, int code) {
+        KeyCombination keyCombo = keyMap.getKey(type, code);
         if (keyCombo == null) {
-            debug("  unknown key");
+            debug("  unmapped key");
             return;
         }
-        debug("  pressing key: "+keyCodeAndroid+" -> combo: "+keyCombo.toString());
+        debug("  pressing key: "+code+" -> combo: "+keyCombo.toString());
         if (config.isDelayKeys()) {
             keyCombo.hitKeysDelayed(robot);
         } else {

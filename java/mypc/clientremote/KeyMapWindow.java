@@ -3,6 +3,8 @@ package mypc.clientremote;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
@@ -70,21 +72,21 @@ public class KeyMapWindow extends JFrame {
         final JPanel panel1 = new JPanel(new FlowLayout()); // for scan button
         final JPanel panel2 = new JPanel(new FlowLayout()); // for IP textfield and test button
         final JPanel panel3 = new JPanel(new FlowLayout()); // for the KeyMap description
+        final JPanel remotePanel = new JPanel(new FlowLayout()); // for the KeyMap description
         mainPanel.add(panel1);
         mainPanel.add(panel2);
+        mainPanel.add(panel3);
         mainPanel.add(new JPanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
         mainPanel.add(new JPanel()); // separator
-        mainPanel.add(panel3);
+        mainPanel.add(remotePanel);
 
         // Selection of KeyMap
-        final JLabel labelIp = new JLabel("Select Mapping: ");
+        final JLabel labelIp = new JLabel("Select mapping: ");
         panel1.add(labelIp);
         String[] choices = { "DEFAULT", "CUSTOM"};
         JComboBox<String> dropdown = new JComboBox<String>(choices);
         panel1.add(dropdown);
-        JButton butTest = new JButton("Test");
-        panel1.add(butTest);
 
         // Select configured mapping
         Config config = Config.getInstance();
@@ -96,7 +98,7 @@ public class KeyMapWindow extends JFrame {
             dropdown.setSelectedIndex(0); // default
             keyMap = new KeyMapDefault();
         }
-        panel3.add(keyMap.getInstructions());
+        remotePanel.add(keyMap.getInstructions());
 
         // Add listener to the dropdown
         connection = ConnectionService.getInstance();
@@ -112,8 +114,8 @@ public class KeyMapWindow extends JFrame {
                 } else {
                     keyMap = new KeyMapDefault();
                 }
-                panel3.removeAll();
-                panel3.add(keyMap.getInstructions());
+                remotePanel.removeAll();
+                remotePanel.add(keyMap.getInstructions());
                 connection.reloadKeymap();
                 pack();
             }
@@ -123,13 +125,51 @@ public class KeyMapWindow extends JFrame {
         panel2.add(new JLabel("Message from TV: "));
         JLabel lastMessage = new JLabel("");
         panel2.add(lastMessage);
-        connection.setMessageReceivedEvent(new ConnectionService.MessageReceivedEvent() {
+
+        //JButton butTest = new JButton("Test");
+        //panel3.add(butTest);
+        panel3.add(new JLabel("Key pressed: "));
+        //JTextField keyIn = new JTextField(2);
+        //panel3.add(keyIn);
+        JLabel lastKey = new JLabel("");
+        panel3.add(lastKey);
+        /*
+        keyIn.addKeyListener(new KeyListener() {
             @Override
-            public void onMessageReceived(String message) {
-                lastMessage.setText("");
-                lastMessage.setText(message);
+            public void keyTyped(KeyEvent keyEvent) { }
+            @Override
+            public void keyPressed(KeyEvent keyEvent) { }
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                lastKey.setText(KeyEvent.getKeyText(keyEvent.getKeyCode()));
+                keyEvent.consume();
+                keyIn.setText("");
             }
         });
+        */
+
+        //panel3.grabFocus();
+        //panel3.setFocusable(true);
+        //panel3.requestFocusInWindow();
+
+        connection.setMessageReceivedEvent(new ConnectionService.MessageReceivedEvent() {
+            @Override
+            public void onMessageReceived(String msg) {
+                lastMessage.setText("");
+                lastMessage.setText(msg);
+
+                // Parse message and find mapped key
+                Message message = new Message(msg);
+                if (message.isKey()) {
+                    KeyCombination combo = keyMap.getKey(message.getKeyType(), message.getKeyCode());
+                    if (combo != null) {
+                        lastKey.setText(combo.toString());
+                    }
+                }
+
+            }
+        });
+
 
         // Allow the window to close (without closing the app)
         // setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

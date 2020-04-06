@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-/* TODO LIST
+/* TODO LIST:
  * Improve installer: https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
  *   or even get rid of it and use only .appx methods
  * Improve look & feel to resemble a modern application (check UIManager.setLookAndFeel())
@@ -33,7 +33,6 @@ import java.util.Date;
  * Improve NetworkScanner to allow networks other-than-TypeC and to do a broadcast to add hosts that respond
  *
  */
-// TODO
 
 public class ClientRemote {
     private static ClientRemote instance;
