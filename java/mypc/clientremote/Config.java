@@ -3,15 +3,12 @@ package mypc.clientremote;
 import java.util.prefs.Preferences;
 
 public class Config {
-    private final int port = 50505;
     private static Config instance;
     private Preferences prefs;
-    // Pref IDs
-    private String IPADDRESS_ID = "IPADDRESS";
 
     // Config items:
+    private final int port = 50505;
     private boolean debug = false;
-    private boolean delayKeys = false;
 
     public static Config getInstance() { 
         if (instance == null) instance = new Config(); 
@@ -26,13 +23,19 @@ public class Config {
     public void setDebug(boolean val) { debug = val; }
     public boolean isDebug() { return debug; }
 
-    public void setDelayKeys(boolean val) { delayKeys = val; }
-    public boolean isDelayKeys() { return delayKeys; }
-
     // TODO we may want to cache the IP address in the object
-    public void setIpAddress(String addr) { prefs.put(IPADDRESS_ID, addr); }
-    public String getIpAddress() { return prefs.get(IPADDRESS_ID, ""); }
+    public void setIpAddress(String val) { prefs.put("IPADDRESS", val); }
+    public String getIpAddress() { return prefs.get("IPADDRESS", ""); }
     public boolean isSetIpAddress() { return ! getIpAddress().equals(""); }
+
+    public void setConnectOnStart(boolean val) { prefs.putBoolean("CONNECTONSTART", val); }
+    public boolean isConnectOnStart() { return prefs.getBoolean("CONNECTONSTART", true); }
+
+    public void setDelayKeys(boolean val) { prefs.putBoolean("DELAYKEYS", val); }
+    public boolean isDelayKeys() { return prefs.getBoolean("DELAYKEYS", false); }
+
+    public void setKeyMap(String val) { prefs.put("KEYMAP", val); }
+    public String getKeyMap() { return prefs.get("KEYMAP", "DEFAULT"); }
 
     public int getPort() { return port; }
 

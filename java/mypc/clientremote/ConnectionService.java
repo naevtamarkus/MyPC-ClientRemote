@@ -2,7 +2,6 @@
 package mypc.clientremote;
 
 import java.awt.Robot;
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,6 +26,7 @@ public class ConnectionService {
     private Status status = Status.READY;
     Thread connectionThread;
     private static final int PROTOCOL_VERSION = 1;
+    private KeyMap keyMap; 
 
     public enum Status { READY, CONNECTING, RECONNECTING, CONNECTED, ERROR };
 
@@ -57,6 +57,14 @@ public class ConnectionService {
             debug("Couldn't Create robot");
             status = Status.ERROR;
             // TODO handle this properly (e.g. unrecoverable error?)
+        }
+        // Select keymap
+        if (config.getKeyMap().equals("CUSTOM")) {
+            keyMap = new KeyMapCustom();
+            debug("Loaded Custom KeyMap with "+keyMap.size()+" entries");
+        } else {
+            keyMap = new KeyMapDefault();
+            debug("Loaded Default KeyMap with "+keyMap.size()+" entries");
         }
     }
 
@@ -108,11 +116,13 @@ public class ConnectionService {
                             String msgType = st.split(" ")[0];
                             String msgContent = st.split(" ",2)[1];
                             if (msgType.equals("S")) {
-                                processSingleKey(msgContent);
+                                processKey(msgContent, KeyMap.KeyType.SHORT);
                             } else if (msgType.equals("L")) {
-                                processLongKey(msgContent);
+                                processKey(msgContent, KeyMap.KeyType.LONG);
                             } else if (msgType.equals("I")) {
                                 processInfoMessage(msgContent);
+                            } else {
+                                debug ("Unknown message");
                             }
                         }
                         //Close connection 
@@ -161,62 +171,19 @@ public class ConnectionService {
         // TODO handle more unrecoverable errors (and change connection status)
     }
 
-    private void processSingleKey(String message) {
+    private void processKey(String message, KeyMap.KeyType type) {
         int keyCodeAndroid = Integer.parseInt(message);
-        switch(keyCodeAndroid){
-            // Basic navigation keys
-            case 19:  hitKey(KeyEvent.VK_UP); break;
-            case 20:  hitKey(KeyEvent.VK_DOWN); break;
-            case 21:  hitKey(KeyEvent.VK_LEFT); break;
-            case 22:  hitKey(KeyEvent.VK_RIGHT); break;
-            case 23:  hitKey(KeyEvent.VK_ENTER); break;  // Center key
-            //case 4:   hitKey(KeyEvent.VK_BACK_SPACE); break;  // Back key
-            case 4:   hitKey(KeyEvent.VK_ESCAPE); break;  // Back key
-
-            // Extended navigation keys
-            case 166: hitKey(KeyEvent.VK_TAB); break;  // program up
-            case 167: hitKeys(KeyEvent.VK_SHIFT, KeyEvent.VK_TAB); break;  // program down
-            //case 111: hitKey(KeyEvent.VK_ESCAPE); break;  // exit
-            case 111: hitKeys(KeyEvent.VK_ALT, KeyEvent.VK_F4); break;  // exit
-            case 233: hitKey(KeyEvent.VK_CONTEXT_MENU); break;  // teletext
-            case 165: hitKey(KeyEvent.VK_WINDOWS); break;  // teletext
-            case 229: hitKeys(KeyEvent.VK_ALT, KeyEvent.VK_ESCAPE); break;  // back-forth key between prog/volume
-
-            //case 62: hitKey(KeyEvent.VK_SPACE); break;
-            //case 66: hitKey(KeyEvent.VK_ENTER); break;
-            //case 67: hitkey(KeyEvent.VK_BACK_SPACE); break;
-
-            // Quick launch icons (in order)
-            case 8:  hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_1); break;  // 1
-            case 9:  hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_2); break;  // 2
-            case 10: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_3); break;  // 3
-            case 11: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_4); break;  // 4
-            case 12: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_5); break;  // 5
-            case 13: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_6); break;  // 6
-            case 14: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_7); break;  // 7
-            case 15: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_8); break;  // 8
-            case 16: hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_9); break;  // 9
-            case 7:  hitKeys(KeyEvent.VK_WINDOWS, KeyEvent.VK_0); break;  // 0
-            
-            // Playback keys
-            case 126: hitKey(KeyEvent.VK_SPACE); break;  // Play
-            case 85:  hitKey(KeyEvent.VK_SPACE); break;  // Pause
-            case 89:  hitKeys(KeyEvent.VK_CONTROL, KeyEvent.VK_LEFT); break;  // Rewind
-            case 90:  hitKeys(KeyEvent.VK_CONTROL, KeyEvent.VK_RIGHT); break;  // Forewind
-            case 88:  hitKey(KeyEvent.VK_N); break;  // Next
-            case 87:  hitKey(KeyEvent.VK_P); break;  // Previous
-            case 86:  hitKey(KeyEvent.VK_S); break;  // Stop
-            case 175: hitKey(KeyEvent.VK_F); break;  // Full Screen
+        KeyCombination keyCombo = keyMap.getKey(type, keyCodeAndroid);
+        if (keyCombo == null) {
+            debug("  unknown key");
+            return;
         }
-
-    }
-
-    private void processLongKey(String message) {
-        int keyCodeAndroid = Integer.parseInt(message);
-        switch(keyCodeAndroid){
-            // Extended navigation keys
-            //case 111: hitKeys(KeyEvent.VK_ALT, KeyEvent.VK_F4); break;  // exit
-        } 
+        debug("  pressing key: "+keyCodeAndroid+" -> combo: "+keyCombo.toString());
+        if (config.isDelayKeys()) {
+            keyCombo.hitKeysDelayed(robot);
+        } else {
+            keyCombo.hitKeys(robot);
+        }
     }
 
     private void processInfoMessage(String message) {
@@ -232,98 +199,7 @@ public class ConnectionService {
         }
     }
     
-
-    // https://github.com/justin-taylor/Remote-Desktop-Server/blob/revert_to_old_state/src/AutoBot.java
-    // https://stackoverflow.com/questions/14572270/how-can-i-perfectly-simulate-keyevents/14615814
-    private void hitKey(final int pcKey) {
-        if (config.isDelayKeys()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        // Nothing
-                    }
-                    robot.keyPress(pcKey);
-                    robot.keyRelease(pcKey);
-                }
-            }).start();
-        } else {
-            robot.keyPress(pcKey);
-            robot.keyRelease(pcKey);
-        }
-    }
-
-    private void hitKeys(final int pcKey1, final int pcKey2) {
-        if (config.isDelayKeys()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        // Nothing
-                    }
-                    robot.keyPress(pcKey1);
-                    robot.keyPress(pcKey2);
-                    robot.keyRelease(pcKey2);
-                    robot.keyRelease(pcKey1);
-                }
-            }).start();
-        } else {
-            robot.keyPress(pcKey1);
-            robot.keyPress(pcKey2);
-            robot.keyRelease(pcKey2);
-            robot.keyRelease(pcKey1);
-        }
-    }
-
+    
 
 }
 
-/* Other keys: 
-// TOP small buttons
-241 - Digital/analog
-232 - TV/Radio
-111 - Exit
-NO  - Ext. box menu
-
-// Numeric pad
-[8-16] - [1-9] 
-7   - 0
-165 - i+
-233 - Teletext 
-
-// Teletext colors
-183 - txt red
-184 - txt green
-185 - txt yellow
-186 - txt blue
-
-// Arrows and surrounding
-[19-22] - up/down/left/right
-23  - Center key
-4   - Back key
-NO  - volume up/down
-229 - back-forth arrows between volume and programs
-NO  - mute
-166 - program up
-167 - program down
-
-222 - audio
-89  - rewind
-126 - play
-90  - forewind
-
-175 - options...
-88  - -1 track
-85  - pause
-87  - +1 track
-
-NO  - Help
-130 - Rec
-86  - Stop
-NO  - Title list
-
-*/
