@@ -24,7 +24,6 @@ import java.util.Date;
  * Improve installer: https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
  *   or even get rid of it and use only .appx methods
  * Improve look & feel to resemble a modern application (check UIManager.setLookAndFeel())
- * Prevent the same window from opening twice (singletons?)
  * Reduce verbosity when TV cannot be reached
  * Cache the IP address in the config object (e.g. can also apply to other config items)
  * Handle ConnectionService ERROR state properly (e.g. unrecoverable error?)
@@ -157,7 +156,7 @@ public class ClientRemote {
             public void actionPerformed(final ActionEvent e) {
                 //displayConfigWindow();
                 debug("Opening KeyMap window");
-                ConfigWindow.display();
+                KeyMapWindow.display();
             }
         }));
 

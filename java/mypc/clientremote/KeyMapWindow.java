@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,22 +28,16 @@ import static mypc.clientremote.ClientRemote.debug;
 
 public class KeyMapWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
-    private final JLabel labelStatus; // to change status from a method
 
     // When isActive, currentWindow has the real object (which object changes after
     // closing)
     private static boolean isActive = false;
     private static KeyMapWindow currentWindow;
-
-    private static JButton butTest;
-    private static JTextField txtIp;
-    private static Config config;
-    private static JButton butScan;
-
-    private static NetworkScanner scanner;
+    private static ConnectionService connection;
 
     // Windows should go into separate threads
     public static void display() {
+        if (isActive) return;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -74,176 +69,82 @@ public class KeyMapWindow extends JFrame {
         // Add panels
         final JPanel panel1 = new JPanel(new FlowLayout()); // for scan button
         final JPanel panel2 = new JPanel(new FlowLayout()); // for IP textfield and test button
-        final JPanel panel3 = new JPanel(new FlowLayout()); // for scan status txt
-        final JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
-        final JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
-        final JPanel panel6 = new JPanel(new FlowLayout()); // for mailto link
-        final JPanel panel7 = new JPanel(new FlowLayout()); // for websute link
+        final JPanel panel3 = new JPanel(new FlowLayout()); // for the KeyMap description
         mainPanel.add(panel1);
         mainPanel.add(panel2);
+        mainPanel.add(new JPanel()); // separator
+        mainPanel.add(new JSeparator()); // horizontal bar
+        mainPanel.add(new JPanel()); // separator
         mainPanel.add(panel3);
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(panel4);
-        mainPanel.add(panel5);
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(panel6);
-        mainPanel.add(panel7);
 
-        // Network Scan button
-        butScan = new JButton("Scan local network");
-        panel1.add(butScan);
+        // Selection of KeyMap
+        final JLabel labelIp = new JLabel("Select Mapping: ");
+        panel1.add(labelIp);
+        String[] choices = { "DEFAULT", "CUSTOM"};
+        JComboBox<String> dropdown = new JComboBox<String>(choices);
+        panel1.add(dropdown);
+        JButton butTest = new JButton("Test");
+        panel1.add(butTest);
 
-        // IP address setting & test button
-        final JLabel labelIp = new JLabel("TV IP address: ");
-        panel2.add(labelIp);
-        txtIp = new JTextField(15);
-        panel2.add(txtIp);
-        butTest = new JButton("Set & Test");
-        panel2.add(butTest);
+        // Select configured mapping
+        Config config = Config.getInstance();
+        KeyMap keyMap;
+        if (config.getKeyMap().equals("CUSTOM")) {
+            dropdown.setSelectedIndex(1); // custom
+            keyMap = new KeyMapCustom();
+        } else {
+            dropdown.setSelectedIndex(0); // default
+            keyMap = new KeyMapDefault();
+        }
+        panel3.add(keyMap.getInstructions());
 
-        // Load configured IP address
-        config = Config.getInstance();
-        txtIp.setText(config.getIpAddress());
-        // And write to config if changed
-        butTest.addActionListener(new ActionListener() {
+        // Add listener to the dropdown
+        connection = ConnectionService.getInstance();
+        dropdown.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(final ActionEvent e) {
-                config.setIpAddress(txtIp.getText());
-                // Try immediately
-                if (config.isSetIpAddress())
-                    ConnectionService.getInstance().connect();
-            }
-        });
-
-        // Scan button
-        butScan.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (scanner != null && scanner.isScanning()) {
-                    // If scanning, stop. Set the buttons to start again
-                    labelStatus.setText("Stopping search..."); // onFinish() should replace it later
-                    butScan.setText("Scan local network");
-                    scanner.cancel();
+            public void actionPerformed(ActionEvent e) {
+                String selectedItem = (String) dropdown.getSelectedItem();
+                debug ("Scrolldown selected: "+selectedItem);
+                config.setKeyMap(selectedItem);
+                KeyMap keyMap;
+                if (selectedItem.equals("CUSTOM")) {
+                    keyMap = new KeyMapCustom();
                 } else {
-                    // If not scanning, start. Set the buttons to stop.
-                    labelStatus.setText("Searching, please wait");
-                    butScan.setText("Stop Scan");
-                    startNetworkScan();
+                    keyMap = new KeyMapDefault();
                 }
+                panel3.removeAll();
+                panel3.add(keyMap.getInstructions());
+                connection.reloadKeymap();
+                pack();
             }
         });
 
-        // Status
-        labelStatus = new JLabel(" ");
-        panel3.add(labelStatus);
-
-        // ConnectOnStart checkbox
-        final JCheckBox cbAuto = new JCheckBox("Connect to TV automatically on Startup");
-        panel4.add(cbAuto);
-        cbAuto.setSelected(config.isConnectOnStart());
-        cbAuto.addActionListener(new ActionListener() {
+        // Show messages from connection
+        panel2.add(new JLabel("Message from TV: "));
+        JLabel lastMessage = new JLabel("");
+        panel2.add(lastMessage);
+        connection.setMessageReceivedEvent(new ConnectionService.MessageReceivedEvent() {
             @Override
-            public void actionPerformed(final ActionEvent e) {
-                config.setConnectOnStart(cbAuto.isSelected());
+            public void onMessageReceived(String message) {
+                lastMessage.setText("");
+                lastMessage.setText(message);
             }
         });
-
-        // ConnectOnStart checkbox
-        final JCheckBox cbDelay = new JCheckBox("Delay keystrokes (debug only)");
-        panel5.add(cbDelay);
-        cbDelay.setSelected(config.isDelayKeys());
-        cbDelay.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                config.setDelayKeys(cbDelay.isSelected());
-            }
-        });
-
-        panel6.add(new JLabel("Send feedback to: "));
-        panel6.add(new JHyperlink(EMAIL, URL_EMAIL));
-
-        panel7.add(new JLabel("MyPC App website: "));
-        panel7.add(new JHyperlink(URL_WEBSITE, URL_WEBSITE));
 
         // Allow the window to close (without closing the app)
         // setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(final WindowEvent e) {
                 isActive = false;
+                connection.setMessageReceivedEvent(null); // reset service so that
                 dispose();
             }
         });
-        setTitle("MyPC configuration"); // "super" JFrame sets title
+        setTitle("MyPC Key Mapping"); // "super" JFrame sets title
         //setSize(450, 360); // "super" JFrame sets initial size
         setVisible(true); // "super" JFrame shows
         pack();
-
     }
-
-    // This is called from the ClientRemote main class, which gets signals from the
-    // ConnectionService in turn.
-    public static void setStatus(final ConnectionService.Status status) {
-        if (!isActive)
-            return;
-        switch (status) {
-            case READY:
-                currentWindow.labelStatus.setText("Ready");
-                break;
-            case CONNECTING:
-                currentWindow.labelStatus.setText("Connecting...");
-                break;
-            case CONNECTED:
-                currentWindow.labelStatus.setText("Connected");
-                break;
-            case RECONNECTING:
-                currentWindow.labelStatus.setText("Reconnecting...");
-                break;
-            case ERROR:
-                currentWindow.labelStatus.setText("ERROR");
-                break;
-        }
-    }
-
-    private static void startNetworkScan() {
-        debug("Scanning local network");
-        scanner = new NetworkScanner();
-        // scanner.addFullNetworkFromIPTypeC("192.168.43.116");
-        scanner.addIpAddress("127.0.0.1");
-        scanner.addAllTypeCNetworksAvailable();
-        scanner.addPort(50505);
-        // scanner.addPortRange(1, 200);
-        scanner.setStopAfterFound(true);
-
-        scanner.setOnFinishCallback(new NetworkScanner.onFinishCallback() {
-            @Override
-            public void onFinish() {
-                final int count = scanner.getHitResults().size();
-                // int count = 0;
-                debug("Scan finished, " + count + " found");
-                currentWindow.labelStatus.setText("Scan finished, " + count + " found");
-                butScan.setText("Scan local network");
-            }
-        });
-
-        scanner.setOnFoundCallback(new NetworkScanner.onFoundCallback() {
-            @Override
-            public void onFound(final String ip, final int port) {
-                debug (" found "+ip+":"+port);
-                // TODO enable this after doing tests
-                currentWindow.labelStatus.setText("Found: "+ip);
-                txtIp.setText(""); // We seem to have problems resetting the field, we blank if first
-                txtIp.setText(ip);
-                //butTest.doClick();
-            }
-        });
-
-        scanner.start();
-    }
-
 
 }
 

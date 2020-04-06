@@ -23,6 +23,7 @@ public class ConnectionService {
     private Config config;
     private boolean disconnectNow = false; // TODO maybe we don't need this? Or maybe in Config class?
     ConnectionChangeEvent connectionChangeEvent;
+    MessageReceivedEvent messageReceivedEvent;
     private Status status = Status.READY;
     Thread connectionThread;
     private static final int PROTOCOL_VERSION = 1;
@@ -41,8 +42,16 @@ public class ConnectionService {
         public void onConnectionChanged();
     }
 
-    public void setConnectionChangeEvent(ConnectionChangeEvent conev) {
-        connectionChangeEvent = conev;
+    public interface MessageReceivedEvent {
+        public void onMessageReceived(String message);
+    }
+
+    public void setConnectionChangeEvent(ConnectionChangeEvent event) {
+        connectionChangeEvent = event;
+    }
+
+    public void setMessageReceivedEvent(MessageReceivedEvent event) {
+        messageReceivedEvent = event;
     }
 
     public Status getStatus() { return status; }
@@ -58,6 +67,10 @@ public class ConnectionService {
             status = Status.ERROR;
         }
         // Select keymap
+        reloadKeymap();
+    }
+
+    public void reloadKeymap() {
         if (config.getKeyMap().equals("CUSTOM")) {
             keyMap = new KeyMapCustom();
             debug("Loaded Custom KeyMap with "+keyMap.size()+" entries");
@@ -66,7 +79,6 @@ public class ConnectionService {
             debug("Loaded Default KeyMap with "+keyMap.size()+" entries");
         }
     }
-
     /*
     // Beware you should run this inside of a thread
     public boolean testHost(String ip, int timeout) {
@@ -112,6 +124,13 @@ public class ConnectionService {
                             String st = input.readLine();
                             if (st == null) throw new IOException("received null value!"); // TODO we get this when disconnected, better handle in a better way?
                             debug("ConnectionService: client received msg from server: "+st);
+                            // Send to listener, if any
+                            if (messageReceivedEvent != null) {
+                                debug ("  redirecting message to event listener");
+                                messageReceivedEvent.onMessageReceived(st);
+                                // Don't process message anymore
+                                continue;
+                            }
                             // Hit the key in the local PC
                             String msgType = st.split(" ")[0];
                             String msgContent = st.split(" ",2)[1];

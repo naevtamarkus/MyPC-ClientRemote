@@ -34,6 +34,7 @@ public class UpdateWindow extends JFrame {
 
     // Windows should go into separate threads
     public static void display() {
+        if (isActive) return;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

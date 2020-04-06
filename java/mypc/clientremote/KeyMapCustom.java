@@ -95,7 +95,7 @@ public class KeyMapCustom extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JLabel text = new JLabel("this is an example");
+        JLabel text = new JLabel("This is the Custom KeyMap");
         JPanel panel = new JPanel();
         panel.add(text);
         return panel;
