@@ -56,7 +56,6 @@ public class ConnectionService {
         catch (Exception e) {
             debug("Couldn't Create robot");
             status = Status.ERROR;
-            // TODO handle this properly (e.g. unrecoverable error?)
         }
         // Select keymap
         if (config.getKeyMap().equals("CUSTOM")) {
@@ -68,19 +67,20 @@ public class ConnectionService {
         }
     }
 
+    /*
     // Beware you should run this inside of a thread
     public boolean testHost(String ip, int timeout) {
         Socket s = new Socket();
         try {
             s.setSoTimeout(timeout);
             s.connect(new InetSocketAddress(ip, config.getPort()), timeout);
-            // TODO maybe we should check if we get the right welcome message
             s.close();
             return true;
         } catch (Exception e) {
             return false;
         }
     }
+    */
 
     public void connect() {
         // We assume we enter from READY or ERROR states most times... anyway, treat as connecting for the first time (no alerts)

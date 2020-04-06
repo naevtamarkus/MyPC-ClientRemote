@@ -113,7 +113,8 @@ class NetworkScanner {
         ipsToScan.add(ip);
     }
 
-    // TODO implement!
+
+    /*
     //Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
     // https://commons.apache.org/proper/commons-net/javadocs/api-3.6/org/apache/commons/net/util/SubnetUtils.html
     // https://docs.oracle.com/javase/7/docs/api/java/net/InterfaceAddress.html
@@ -124,6 +125,7 @@ class NetworkScanner {
         //SubnetInfo
         //int prefixLength = iAddr.getNetworkPrefixLength();
     }
+    */
 
     public void addFullNetworkFromIPTypeC(InetAddress ipAddr) {
         try {
@@ -209,14 +211,6 @@ class NetworkScanner {
                 public void run() {
                     waitForCompletion();
                     onFinishCallback.onFinish(); // we already checked != null
-                    /*
-                    try {
-                        executor.awaitTermination(500L, TimeUnit.HOURS);
-                    } catch (Exception e) {
-                        // Nothing
-                    }
-                    onFinishCallback.onFinish();
-                    */
                 }
             }).start();
         }
@@ -271,7 +265,7 @@ class NetworkScanner {
                     Socket socket = new Socket();
                     socket.connect(new InetSocketAddress(ip, port), timeout);
                     socket.close();
-                    // TODO watch out which thread we need to run on
+                    // TODO watch out which thread we need to run on (on Android... on Java does not seem to matter)
                     if (onFoundCallback != null) onFoundCallback.onFound(ip, port);
                     if (stopAfterFound) cancel(); 
                     return new ScanResult(ip, port, true);

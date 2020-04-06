@@ -38,7 +38,6 @@ public class UpdateWindow extends JFrame {
             @Override
             public void run() {
                 currentWindow = new UpdateWindow();  // Let the constructor do the job
-               // TODO make it so that we can only show this window once, to avoid overwriting this. Singleton maybe?
             }
          });
     }
@@ -49,7 +48,7 @@ public class UpdateWindow extends JFrame {
             // Set the default OS's style
             //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); // TODO improve this
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (Exception e) {
             // nothing
         }

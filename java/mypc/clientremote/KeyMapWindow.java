@@ -8,12 +8,10 @@ import java.awt.event.WindowEvent;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,14 +25,14 @@ import static mypc.clientremote.ClientRemote.URL_EMAIL;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 
-public class ConfigWindow extends JFrame {
+public class KeyMapWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
     private final JLabel labelStatus; // to change status from a method
 
     // When isActive, currentWindow has the real object (which object changes after
     // closing)
     private static boolean isActive = false;
-    private static ConfigWindow currentWindow;
+    private static KeyMapWindow currentWindow;
 
     private static JButton butTest;
     private static JTextField txtIp;
@@ -48,12 +46,12 @@ public class ConfigWindow extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                currentWindow = new ConfigWindow(); // Let the constructor do the job
+                currentWindow = new KeyMapWindow(); // Let the constructor do the job
             }
         });
     }
 
-    private ConfigWindow() {
+    private KeyMapWindow() {
         isActive = true;
         try {
             // Set the default OS's style
@@ -235,6 +233,7 @@ public class ConfigWindow extends JFrame {
             @Override
             public void onFound(final String ip, final int port) {
                 debug (" found "+ip+":"+port);
+                // TODO enable this after doing tests
                 currentWindow.labelStatus.setText("Found: "+ip);
                 txtIp.setText(""); // We seem to have problems resetting the field, we blank if first
                 txtIp.setText(ip);
@@ -248,7 +247,7 @@ public class ConfigWindow extends JFrame {
 
 }
 
-/* use this schema to start new processes:
+/*
 SwingWorker worker = new SwingWorker<Integer, Integer>() {
     @Override
     public Integer doInBackground() {

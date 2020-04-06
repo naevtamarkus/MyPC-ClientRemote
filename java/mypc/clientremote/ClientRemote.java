@@ -20,7 +20,21 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
-// TODO https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
+/* TODO LIST
+ * Improve installer: https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
+ *   or even get rid of it and use only .appx methods
+ * Improve look & feel to resemble a modern application (check UIManager.setLookAndFeel())
+ * Prevent the same window from opening twice (singletons?)
+ * Reduce verbosity when TV cannot be reached
+ * Cache the IP address in the config object (e.g. can also apply to other config items)
+ * Handle ConnectionService ERROR state properly (e.g. unrecoverable error?)
+ * consider checking if we get the right welcome message in the testHost() in ConnectionService
+ * Improve error-handling of the ConnectionService
+ * Replace " + " by something that can't be repeated in KeyCombination (e.g. ++)
+ * Improve NetworkScanner to allow networks other-than-TypeC and to do a broadcast to add hosts that respond
+ *
+ */
+// TODO
 
 public class ClientRemote {
     private static ClientRemote instance;
@@ -136,7 +150,16 @@ public class ClientRemote {
                 debug("Opening Config window");
                 ConfigWindow.display();
             }
-        })); 
+        }));
+
+        mainMenu.add(new MenuItem("Key Mapping", new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                //displayConfigWindow();
+                debug("Opening KeyMap window");
+                ConfigWindow.display();
+            }
+        }));
 
         /*
         // Some elements only go in when in debug mode

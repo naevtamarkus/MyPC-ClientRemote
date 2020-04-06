@@ -16,14 +16,12 @@ public class Config {
     } 
 
     private Config() {
-        // Constructor
         prefs = Preferences.userRoot().node(this.getClass().getName());
     }
 
     public void setDebug(boolean val) { debug = val; }
     public boolean isDebug() { return debug; }
 
-    // TODO we may want to cache the IP address in the object
     public void setIpAddress(String val) { prefs.put("IPADDRESS", val); }
     public String getIpAddress() { return prefs.get("IPADDRESS", ""); }
     public boolean isSetIpAddress() { return ! getIpAddress().equals(""); }

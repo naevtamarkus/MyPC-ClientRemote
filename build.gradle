@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies{
-    compile 'com.dorkbox:SystemTray:3.17'
+    implementation 'com.dorkbox:SystemTray:3.17'
 }
 
 sourceSets {
@@ -18,7 +18,7 @@ sourceSets {
 }
 
 tasks.withType(Jar) {
-    destinationDir = file("$rootDir")
+    destinationDirectory = file("$rootDir")
     archiveFileName = "MyPCClientRemote.jar"
 }
 
