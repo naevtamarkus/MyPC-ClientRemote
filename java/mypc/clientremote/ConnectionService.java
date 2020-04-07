@@ -105,15 +105,17 @@ public class ConnectionService {
         connectionThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean retrying = false; // only used for logging purposes (to avoid too much noise)
                 while (! disconnectNow && ! Thread.currentThread().isInterrupted()) {
                     // Loop again and again to connect
                     try {
-                        debug("ConnectionService: client connecting to server");
+                        if (!retrying) debug("ConnectionService: client connecting to server");
                         Socket s = new Socket(config.getIpAddress(), config.getPort());
                         //outgoing stream redirect to socket
                         //OutputStream out = s.getOutputStream();
                         //PrintWriter output = new PrintWriter(out);
                         //output.println("Hello Android!");
+                        retrying = false; // we went through, we enable logging
                         status = Status.CONNECTED;
                         if (connectionChangeEvent != null) connectionChangeEvent.onConnectionChanged();
                         BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -152,13 +154,13 @@ public class ConnectionService {
                     // Track the whole exception stack (first the lowest in the stack)
                     } catch (ConnectException e) {
                         // This is a problem with the remote server, probably Connection Refused. Just catch and continue
-                        debug(Arrays.toString(e.getStackTrace()));
+                        if(!retrying) debug(Arrays.toString(e.getStackTrace()));
                     } catch (NoRouteToHostException e) {
                         // This is a problem with the remote server, probably Connection Refused. Just catch and continue
-                        debug(Arrays.toString(e.getStackTrace()));
+                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
                     } catch (SocketException e) {
                         // This is a problem creating the socket itself, bad IP address and the like
-                        debug(Arrays.toString(e.getStackTrace()));
+                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
                         // In this case, we can't recover from this error
                         status = Status.ERROR;
                         if (connectionChangeEvent != null) connectionChangeEvent.onConnectionChanged();
@@ -166,7 +168,7 @@ public class ConnectionService {
                         continue;
                     } catch (IOException e) {
                         // This is the most generic of the three, just catch and continue
-                        debug(Arrays.toString(e.getStackTrace()));
+                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
                     }
                     // We can recover, just try again
                     if (connectionChangeEvent != null && status != Status.RECONNECTING) {
@@ -176,7 +178,8 @@ public class ConnectionService {
                     } else {
                         status = Status.RECONNECTING;
                     }
-                    debug("ConnectionService: client disconnected. Trying to reconnect");
+                    if (!retrying) debug("ConnectionService: client disconnected. Trying to reconnect");
+                    retrying = true;
 
                     // Wait 5 seconds before connecting again
                     try {
