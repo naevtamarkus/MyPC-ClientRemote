@@ -6,7 +6,7 @@ This companion App enables the Remote Control feature of MyPC. This app will con
 
 Requirements:
 - Android TV with MyPC [installed](https://play.google.com/store/apps/details?id=org.trecet.mypc)
-- PC with Java version 1.8 or higher (e.g. Linux, Windows)
+- PC with Java RE version 1.8 or higher (e.g. Linux, Windows)
 
 This feature is still experimental. Please send your feedback to [naevtamarkus@gmail.com](mailto:naevtamarkus@gmail.com)
 
@@ -19,7 +19,7 @@ A simple installation method is available for Windows 10 users using the [Micros
 Alternatively, installing the MyPC Client Remote by hand should be relatively easy:
  * You can either use the .jar file (Linux and Windows) or .exe (Windows only) that can be downloaded [here](https://github.com/naevtamarkus/MyPC-ClientRemote/releases/latest). You can also compile these files yourself by cloning this repository and using the ```compile.sh``` script.
  * Make the file run at startup. There are several ways to do it and they all depend on your setup. Some examples are available on [Windows](https://tunecomp.net/add-program-to-startup-windows-10/) and [Linux](https://help.ubuntu.com/stable/ubuntu-help/startup-applications.html.en).
-
+ * Remember that you need to have Java Runtime Environment version 1.8 or newer.
 
 ## Contributions are welcome!
 I've developed this App essentially for myself and did a significant effort to make it usable by the general public, but I am aware everyone has a different setup at home which may not be compatible with mine. If you liked the remote-control feature but find something is missing, you are more than welcome to contribute with changes to the code.
