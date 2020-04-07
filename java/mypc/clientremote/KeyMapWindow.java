@@ -1,10 +1,28 @@
 package mypc.clientremote;
 
+/*
+    This is a Companion App that allows users to control their personal computer
+    from their Android TV when they are using the MyPC App:
+    https://play.google.com/store/apps/details?id=org.trecet.mypc
+    Copyright (C) 2020    Pablo Fernandez    naevtamarkus@gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
@@ -12,20 +30,14 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import static mypc.clientremote.ClientRemote.EMAIL;
-import static mypc.clientremote.ClientRemote.URL_EMAIL;
-import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 
 public class KeyMapWindow extends JFrame {
