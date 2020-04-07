@@ -1,10 +1,21 @@
 package mypc.clientremote;
 
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import java.awt.event.KeyEvent;
 
@@ -77,10 +88,48 @@ public class KeyMapDefault extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JLabel text = new JLabel("This is the Default KeyMap");
-        JPanel panel = new JPanel();
-        panel.add(text);
-        return panel;
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout());
+        final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mainPanel.add(panel1);
+        mainPanel.add(panel2);
+        mainPanel.add(panel3);
+
+        // Panel 1
+        String html1 = "<html><body>" +
+                "The Default Keymap defines a minimum mapping that should work for most TV's and PC's. <br><br> " +
+                "It is defined like this:<br></body></html>";
+
+        String html2 = "<html><body>" +
+                "<h3>Quick Launch</h3>" +
+                "These buttons in the TV remote trigger applications<br>" +
+                "in the quick-launch menu. For instance: " +
+                "<ul><li>Channel 1 opens the first application " +
+                "<li>Channel 2 opens the second application " +
+                "<li>and so on...</ul><br>" +
+                "<h3>Navigation</h3>" +
+                "Several TV remote buttons help moving around:<br>" +
+                "<ul><li>Directional pad corresponds to the arrows" +
+                "<li>Channel up/down moves between elements in the<br>window, as the Tab key" +
+                "<li>Central button corresponds to the Enter key " +
+                "<li>The back key is the Escape" +
+                "<li>Teletext, Sync and Exit keys have extra functions<br>to be experimented with</ul><br>" +
+                "<h3>Playback</h3>" +
+                "If available, playback keys are shortcuts to VLC Player <br>control keys";
+        panel1.add(new JLabel(html1));
+
+        Image remoteControl = new ImageIcon(this.getClass().getResource("/remote-control.png"))
+                .getImage().getScaledInstance(139, 446, Image.SCALE_DEFAULT);
+        JLabel imageLabel = new JLabel(new ImageIcon(remoteControl));
+        imageLabel.setBorder(BorderFactory.createEmptyBorder(0,0,0,10));
+        panel2.add(imageLabel);
+        panel2.add(new JLabel((html2)));
+
+        panel3.add(new JLabel("Currently, this KeyMap contains "+size()+" valid keys mapped. "));
+
+        return mainPanel;
     }
 
     @Override

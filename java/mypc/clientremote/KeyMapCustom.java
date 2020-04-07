@@ -170,7 +170,6 @@ public class KeyMapCustom extends KeyMap {
         panel4.add(new JLabel(configFile.toAbsolutePath().toString()));
         panel5.add(new JLabel("Currently, file contains "+size()+" valid keys mapped. Reselect mapping to reload."));
 
-
         return mainPanel;
     }
 
