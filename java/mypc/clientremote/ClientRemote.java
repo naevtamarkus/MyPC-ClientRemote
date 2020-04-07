@@ -27,11 +27,9 @@ import java.util.Date;
  * Reduce verbosity when TV cannot be reached
  * Cache the IP address in the config object (e.g. can also apply to other config items)
  * Handle ConnectionService ERROR state properly (e.g. unrecoverable error?)
- * consider checking if we get the right welcome message in the testHost() in ConnectionService
  * Improve error-handling of the ConnectionService
- * Replace " + " by something that can't be repeated in KeyCombination (e.g. ++)
  * Improve NetworkScanner to allow networks other-than-TypeC and to do a broadcast to add hosts that respond
- *
+ * Review build.gradle to make it cleaner. When I hit Run in an IDE, gradle task keeps on going :(
  */
 
 public class ClientRemote {

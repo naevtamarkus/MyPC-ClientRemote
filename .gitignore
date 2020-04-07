@@ -1,4 +1,11 @@
 /.gradle
 /clientremote.jar
 /debug.txt
-public_repository.iml
+/public_repository.iml
+/.classpath
+/.project
+/.settings/
+/MyPCClientRemote.exe
+/MyPCClientRemote.jar
+/bin
+
