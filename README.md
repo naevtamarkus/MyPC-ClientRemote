@@ -12,9 +12,16 @@ This feature is still experimental. Please send your feedback to [naevtamarkus@g
 
 Visit the MyPC Website: [https://mypc-app.web.app/](https://mypc-app.web.app/)
 
-## Contribute
-Contributions are welcome!
 
+## Installation
+A simple installation method is available for Windows 10 users using the [Microsoft Store](https://www.microsoft.com/store/apps/9NVMBG0N8KMC)
+
+Alternatively, installing the MyPC Client Remote by hand should be relatively easy:
+ * You can either use the .jar file (Linux and Windows) or .exe (Windows only) that can be downloaded [here](https://github.com/naevtamarkus/MyPC-ClientRemote/releases/latest). You can also compile these files yourself by cloning this repository and using the ```compile.sh``` script.
+ * Make the file run at startup. There are several ways to do it and they all depend on your setup. Some examples are available on [Windows](https://tunecomp.net/add-program-to-startup-windows-10/) and [Linux](https://help.ubuntu.com/stable/ubuntu-help/startup-applications.html.en).
+
+
+## Contributions are welcome!
 I've developed this App essentially for myself and did a significant effort to make it usable by the general public, but I am aware everyone has a different setup at home which may not be compatible with mine. If you liked the remote-control feature but find something is missing, you are more than welcome to contribute with changes to the code.
 
 If the contribution is a small bugfix please just make a PR directly, but if you plan to develop something bigger please let me know before doing so. You can always fork out and compile the code yourself... but newer versions of MyPC may render your fork useless over the time; that's why it's probably better if we coordinate a bit.
