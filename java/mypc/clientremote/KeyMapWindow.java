@@ -69,10 +69,10 @@ public class KeyMapWindow extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JPanel(new FlowLayout()); // for scan button
-        final JPanel panel2 = new JPanel(new FlowLayout()); // for IP textfield and test button
-        final JPanel panel3 = new JPanel(new FlowLayout()); // for the KeyMap description
-        final JPanel remotePanel = new JPanel(new FlowLayout()); // for the KeyMap description
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout());
+        final JPanel panel3 = new JPanel(new FlowLayout());
+        final JPanel remotePanel = new JPanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(panel3);
@@ -82,11 +82,12 @@ public class KeyMapWindow extends JFrame {
         mainPanel.add(remotePanel);
 
         // Selection of KeyMap
+        panel1.add(new JLabel("You can change how the keys from the Android TV remote convert into keys in your PC by selecting a Keymap:"));
         final JLabel labelIp = new JLabel("Select mapping: ");
-        panel1.add(labelIp);
+        panel2.add(labelIp);
         String[] choices = { "DEFAULT", "CUSTOM"};
         JComboBox<String> dropdown = new JComboBox<String>(choices);
-        panel1.add(dropdown);
+        panel2.add(dropdown);
 
         // Select configured mapping
         Config config = Config.getInstance();
@@ -122,35 +123,13 @@ public class KeyMapWindow extends JFrame {
         });
 
         // Show messages from connection
-        panel2.add(new JLabel("Message from TV: "));
-        JLabel lastMessage = new JLabel("");
-        panel2.add(lastMessage);
+        panel3.add(new JLabel("Test current mapping (press TV key): "));
+        JLabel lastMessage = new JLabel(" ");
+        panel3.add(lastMessage);
 
-        //JButton butTest = new JButton("Test");
-        //panel3.add(butTest);
-        panel3.add(new JLabel("Key pressed: "));
-        //JTextField keyIn = new JTextField(2);
-        //panel3.add(keyIn);
-        JLabel lastKey = new JLabel("");
+        panel3.add(new JLabel(" -> "));
+        JLabel lastKey = new JLabel(" ");
         panel3.add(lastKey);
-        /*
-        keyIn.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) { }
-            @Override
-            public void keyPressed(KeyEvent keyEvent) { }
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-                lastKey.setText(KeyEvent.getKeyText(keyEvent.getKeyCode()));
-                keyEvent.consume();
-                keyIn.setText("");
-            }
-        });
-        */
-
-        //panel3.grabFocus();
-        //panel3.setFocusable(true);
-        //panel3.requestFocusInWindow();
 
         connection.setMessageReceivedEvent(new ConnectionService.MessageReceivedEvent() {
             @Override
@@ -164,6 +143,8 @@ public class KeyMapWindow extends JFrame {
                     KeyCombination combo = keyMap.getKey(message.getKeyType(), message.getKeyCode());
                     if (combo != null) {
                         lastKey.setText(combo.toString());
+                    } else {
+                        lastKey.setText("(not mapped)");
                     }
                 }
 

@@ -57,8 +57,8 @@ public class KeyCombination {
     public String toString() {
         StringBuilder output = new StringBuilder();
         output.append(KeyEvent.getKeyText(key1));
-        if (numKeys > 1) output.append(" + "+KeyEvent.getKeyText(key2));
-        if (numKeys == 3) output.append(" + "+KeyEvent.getKeyText(key3));
+        if (numKeys > 1) output.append(" ++ "+KeyEvent.getKeyText(key2));
+        if (numKeys == 3) output.append(" ++ "+KeyEvent.getKeyText(key3));
         return output.toString();
     }
 }

@@ -1,13 +1,20 @@
 package mypc.clientremote;
 
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -22,7 +29,7 @@ public class KeyMapCustom extends KeyMap {
     Map<Integer,KeyCombination> longKeys;
     Map<String, Integer> fullKeyboard;
 
-    private static String configFileName = "customkeymap.cfg";
+    private static Path configFile = Paths.get("customkeymap.cfg");
 
     public KeyMapCustom() {
         shortKeys = new HashMap<>();
@@ -30,10 +37,9 @@ public class KeyMapCustom extends KeyMap {
         generateFullKeyboard();
         // Read input config file
         List<String> allLines;
-        Path path = Paths.get(configFileName);
-        debug("Parsing "+configFileName);
+        debug("Parsing "+configFile.toAbsolutePath());
         try {
-            allLines = Files.readAllLines(path);
+            allLines = Files.readAllLines(configFile);
         } catch (IOException e) {
             debug(e.getMessage());
             return;
@@ -55,7 +61,7 @@ public class KeyMapCustom extends KeyMap {
                     int num = Integer.parseInt(m.group(2));
                     // Find the keys in the fullKeyboard dictionary
                     KeyCombination keyCombo;
-                    String[] split = m.group(3).split(" \\+ ");
+                    String[] split = m.group(3).split(" \\+\\+ ");
                     if (split.length == 3) {
                         keyCombo = new KeyCombination(fullKeyboard.get(split[0]), 
                             fullKeyboard.get(split[1]), fullKeyboard.get(split[2]));
@@ -95,10 +101,77 @@ public class KeyMapCustom extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JLabel text = new JLabel("This is the Custom KeyMap");
-        JPanel panel = new JPanel();
-        panel.add(text);
-        return panel;
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mainPanel.add(panel1);
+        mainPanel.add(panel2);
+        mainPanel.add(panel3);
+        mainPanel.add(panel4);
+        mainPanel.add(panel5);
+
+        // Panel 1
+        String html1 = "<html><body>" +
+                "With the Custom Keymap you can modify the "+configFile+" file, located in the installation directory and <br> " +
+                "add one line for each key you want to map.<br><br>Each line is composed of fields separated by spaces and MUST look like this:<br>" +
+                "<h3>TYPE CODE : KEY [ ++ KEY ] [ ++ KEY ]</h3>" +
+                "Where:<ul><li>The TYPE field is the key press type. Possible values are: S for long-press and L for long-press." +
+                "<li>The CODE field is the key code sent by the Android TV. You can check the key code for each key in the <br>test above." +
+                "<li>The third field is a colon character and acts as a separator." +
+                "<li>The KEY field is the corresponding key that is pressed on the PC. Each key has a name, which can be<br> checked in the test below." +
+                "<li>Optionally you can add more keys (a key combination), where more than one key is pressed at the <br>same time." +
+                "You can add up to 3 keys, all separated by the double plus sign. </ul> Examples:<br><br>" +
+                "S 8 : Windows<br>L 165 : Ctrl ++ Open Bracket<br>S 55 : Shift ++ Alt ++ Tab</body></html>";
+        JLabel text1 = new JLabel(html1);
+        panel1.add(text1);
+
+        // Panel 2
+        panel2.add(new JLabel( "You can check most KEY names here:"));
+        JTextField keyIn = new JTextField(2);
+        panel2.add(keyIn);
+        JLabel lastKey = new JLabel("");
+        panel2.add(lastKey);
+        keyIn.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) { }
+            @Override
+            public void keyPressed(KeyEvent keyEvent) { }
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                lastKey.setText(KeyEvent.getKeyText(keyEvent.getKeyCode()));
+                keyEvent.consume();
+                keyIn.setText("");
+            }
+        });
+
+        // Panel 3
+        JButton editButton = new JButton("Edit config file");
+        panel3.add(editButton);
+        JLabel errorMsg = new JLabel("");
+        panel3.add(errorMsg);
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                try {
+                    java.awt.Desktop.getDesktop().edit(configFile.toFile());
+                    errorMsg.setText("");
+                } catch (IOException e) {
+                    errorMsg.setText("-- ERROR reading file --");
+                } catch (UnsupportedOperationException e) {
+                    errorMsg.setText("-- ERROR: action not supported, please edit file manually --");
+                }
+            }
+        });
+        panel3.add(new JLabel("   File location:"));
+        panel4.add(new JLabel(configFile.toAbsolutePath().toString()));
+        panel5.add(new JLabel("Currently, file contains "+size()+" valid keys mapped. Reselect mapping to reload."));
+
+
+        return mainPanel;
     }
 
     @Override
