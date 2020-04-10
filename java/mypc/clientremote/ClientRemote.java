@@ -30,8 +30,10 @@ import mypc.clientremote.ConnectionService.Status;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,14 +67,14 @@ public class ClientRemote {
     public static String URL_WEBSITE = "https://mypc-app.web.app/";
     public static String EMAIL = "naevtamarkus@gmail.com";
     public static String URL_EMAIL = "mailto:"+EMAIL;
+    public static Path DEBUGFILEPATH = Paths.get("debug.txt");
 
     public static void debug(String text) {
         SimpleDateFormat logTime = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
         Date date = new Date();
         String line = logTime.format(date) + " - " + text + "\n";
-        Path path = Paths.get("debug.txt");
         try {
-            Files.write(path, line.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);  //Append mode
+            Files.write(DEBUGFILEPATH, line.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);  //Append mode
         } catch (IOException e) {
             System.out.println(e.toString());
         }
@@ -103,7 +105,13 @@ public class ClientRemote {
 
     private ClientRemote() {
         config = Config.getInstance();
-        config.setDebug(true); // TODO remove this in production
+        // Truncate debug file to 1 MB
+        try (FileChannel outChan = new FileOutputStream(DEBUGFILEPATH.toFile(), true).getChannel()) {
+            outChan.truncate(1000000);
+        } catch (Exception e) {
+            // Nothing
+        }
+        config.setDebug(true);
 
         // Show the tray icon
         displayTrayIcon();

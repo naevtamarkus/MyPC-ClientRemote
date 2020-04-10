@@ -52,9 +52,13 @@ public class KeyMapCustom extends KeyMap {
     private static Path configFile = Paths.get("customkeymap.cfg");
 
     public KeyMapCustom() {
+        generateFullKeyboard();
+        reloadFile();
+    }
+
+    private void reloadFile() {
         shortKeys = new HashMap<>();
         longKeys = new HashMap<>();
-        generateFullKeyboard();
         // Read input config file
         List<String> allLines;
         debug("Parsing "+configFile.toAbsolutePath());
@@ -83,11 +87,11 @@ public class KeyMapCustom extends KeyMap {
                     KeyCombination keyCombo;
                     String[] split = m.group(3).split(" \\+\\+ ");
                     if (split.length == 3) {
-                        keyCombo = new KeyCombination(fullKeyboard.get(split[0]), 
-                            fullKeyboard.get(split[1]), fullKeyboard.get(split[2]));
+                        keyCombo = new KeyCombination(fullKeyboard.get(split[0]),
+                                fullKeyboard.get(split[1]), fullKeyboard.get(split[2]));
                     } else if (split.length == 2) {
-                        keyCombo = new KeyCombination(fullKeyboard.get(split[0]), 
-                            fullKeyboard.get(split[1]));
+                        keyCombo = new KeyCombination(fullKeyboard.get(split[0]),
+                                fullKeyboard.get(split[1]));
                     } else {
                         keyCombo = new KeyCombination(fullKeyboard.get(split[0]));
                     }
@@ -100,7 +104,7 @@ public class KeyMapCustom extends KeyMap {
                 } else {
                     debug("  ignoring line: "+line);
                 }
-    
+
             } catch (Exception e) {
                 // Just ignore the line if something is wrong
                 debug ("  exception handling line: "+line);
@@ -168,27 +172,33 @@ public class KeyMapCustom extends KeyMap {
             }
         });
 
+        JLabel statusLabel = new JLabel("Currently, file contains "+size()+" valid keys mapped.");
+        panel5.add(statusLabel);
+
         // Panel 3
         JButton editButton = new JButton("Edit config file");
         panel3.add(editButton);
-        JLabel errorMsg = new JLabel("");
-        panel3.add(errorMsg);
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                try {
-                    java.awt.Desktop.getDesktop().edit(configFile.toFile());
-                    errorMsg.setText("");
-                } catch (IOException e) {
-                    errorMsg.setText("-- ERROR reading file --");
-                } catch (UnsupportedOperationException e) {
-                    errorMsg.setText("-- ERROR: action not supported, please edit file manually --");
-                }
+                debug("Opening File Edit Window");
+                FileEditWindow.display(configFile, "Edit Custom Mapping",true);
             }
         });
-        panel3.add(new JLabel("   File location:"));
-        panel4.add(new JLabel(configFile.toAbsolutePath().toString()));
-        panel5.add(new JLabel("Currently, file contains "+size()+" valid keys mapped. Reselect mapping to reload."));
+        JButton reloadButton = new JButton("Reload file");
+        panel3.add(reloadButton);
+        reloadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                debug("Reloading config file");
+                reloadFile();
+                // Reload the connection's keymap
+                ConnectionService connection = ConnectionService.getInstance();
+                connection.reloadKeymap();
+                // And upload the status text
+                statusLabel.setText("Currently, file contains "+size()+" valid keys mapped.");
+            }
+        });
 
         return mainPanel;
     }

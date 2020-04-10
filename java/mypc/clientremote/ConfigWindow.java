@@ -42,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import static mypc.clientremote.ClientRemote.DEBUGFILEPATH;
 import static mypc.clientremote.ClientRemote.EMAIL;
 import static mypc.clientremote.ClientRemote.URL_EMAIL;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
@@ -100,6 +101,7 @@ public class ConfigWindow extends JFrame {
         final JPanel panel3 = new JPanel(new FlowLayout()); // for scan status txt
         final JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
         final JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
+        final JPanel panelViewLogs = new JPanel(new FlowLayout()); // Button to view debug logs
         final JPanel panel6 = new JPanel(new FlowLayout()); // for mailto link
         final JPanel panel7 = new JPanel(new FlowLayout()); // for websute link
         mainPanel.add(panel1);
@@ -113,6 +115,7 @@ public class ConfigWindow extends JFrame {
         mainPanel.add(new JPanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
         mainPanel.add(new JPanel()); // separator
+        mainPanel.add(panelViewLogs);
         mainPanel.add(panel6);
         mainPanel.add(panel7);
 
@@ -185,6 +188,17 @@ public class ConfigWindow extends JFrame {
                 config.setDelayKeys(cbDelay.isSelected());
             }
         });
+
+        JButton butViewLogs = new JButton("View debug log");
+        panelViewLogs.add(butViewLogs);
+        butViewLogs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                FileEditWindow.display(DEBUGFILEPATH, "Debug log",false);
+            }
+        });
+
+
 
         panel6.add(new JLabel("Send feedback to: "));
         panel6.add(new JHyperlink(EMAIL, URL_EMAIL));
