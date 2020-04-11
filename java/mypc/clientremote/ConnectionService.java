@@ -167,19 +167,17 @@ public class ConnectionService {
                         
 
                     } catch (UnknownHostException e) {
-                        // TODO Auto-generated catch block
-                        debug(Arrays.toString(e.getStackTrace()));
-
+                        if(!retrying) debug(e.toString() + Arrays.toString(e.getStackTrace()));
                     // Track the whole exception stack (first the lowest in the stack)
                     } catch (ConnectException e) {
                         // This is a problem with the remote server, probably Connection Refused. Just catch and continue
-                        if(!retrying) debug(Arrays.toString(e.getStackTrace()));
+                        if(!retrying) debug(e.toString() + Arrays.toString(e.getStackTrace()));
                     } catch (NoRouteToHostException e) {
                         // This is a problem with the remote server, probably Connection Refused. Just catch and continue
-                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
+                        if(!retrying) debug(e.toString() + Arrays.toString(e.getStackTrace()));
                     } catch (SocketException e) {
                         // This is a problem creating the socket itself, bad IP address and the like
-                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
+                        if(!retrying) debug(e.toString() + Arrays.toString(e.getStackTrace()));
                         // In this case, we can't recover from this error
                         status = Status.ERROR;
                         if (connectionChangeEvent != null) connectionChangeEvent.onConnectionChanged();
@@ -187,7 +185,7 @@ public class ConnectionService {
                         continue;
                     } catch (IOException e) {
                         // This is the most generic of the three, just catch and continue
-                        if (!retrying) debug(Arrays.toString(e.getStackTrace()));
+                        if(!retrying) debug(e.toString() + Arrays.toString(e.getStackTrace()));
                     }
                     // We can recover, just try again
                     if (connectionChangeEvent != null && status != Status.RECONNECTING) {
