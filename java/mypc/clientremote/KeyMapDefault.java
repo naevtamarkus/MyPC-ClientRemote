@@ -155,8 +155,8 @@ public class KeyMapDefault extends KeyMap {
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder();
-        shortKeys.forEach((k, v) -> System.out.println("S " + k + " : " + v.toString()));
-        longKeys.forEach((k, v) -> System.out.println("L " + k + " : " + v.toString()));
+        shortKeys.forEach((k, v) -> output.append("S " + k + " : " + v.toString() + System.lineSeparator()));
+        longKeys.forEach((k, v) -> System.out.println("L " + k + " : " + v.toString() + System.lineSeparator()));
         return output.toString();
     }
     

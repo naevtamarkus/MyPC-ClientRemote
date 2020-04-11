@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import dorkbox.util.IO;
+
 import static mypc.clientremote.ClientRemote.debug;
 
 public class KeyMapCustom extends KeyMap {
@@ -49,7 +52,8 @@ public class KeyMapCustom extends KeyMap {
     Map<Integer,KeyCombination> longKeys;
     Map<String, Integer> fullKeyboard;
 
-    private static Path configFile = Paths.get("customkeymap.cfg");
+    //private static Path configFile = Paths.get("customkeymap.cfg");
+    private static Path configFile = Config.getDataPath().resolve("customkeymap.cfg");
 
     public KeyMapCustom() {
         generateFullKeyboard();
@@ -63,6 +67,10 @@ public class KeyMapCustom extends KeyMap {
         List<String> allLines;
         debug("Parsing "+configFile.toAbsolutePath());
         try {
+            if (!Files.exists(configFile)) {
+                debug ("  config file not found, generating from Default");
+                generateDefaultConfig();
+            }
             allLines = Files.readAllLines(configFile);
         } catch (IOException e) {
             debug(e.getMessage());
@@ -140,8 +148,8 @@ public class KeyMapCustom extends KeyMap {
 
         // Panel 1
         String html1 = "<html><body>" +
-                "With the Custom Keymap you can modify the "+configFile+" file, located in the installation directory and <br> " +
-                "add one line for each key you want to map.<br><br>Each line is composed of fields separated by spaces and MUST look like this:<br>" +
+                "With the Custom Keymap you can modify a configuration file and add one line for each key you want to map.<br> " +
+                "<br>Each line is composed of fields separated by spaces and MUST look like this:<br>" +
                 "<h3>TYPE CODE : KEY [ ++ KEY ] [ ++ KEY ]</h3>" +
                 "Where:<ul><li>The TYPE field is the key press type. Possible values are: S for long-press and L for long-press." +
                 "<li>The CODE field is the key code sent by the Android TV. You can check the key code for each key in the <br>test above." +
@@ -233,6 +241,15 @@ public class KeyMapCustom extends KeyMap {
             if (i == 62000) i=65000;
         }
 
+    }
+
+    private void generateDefaultConfig() {
+        KeyMapDefault keymap = new KeyMapDefault();
+        try {
+            Files.write(configFile, keymap.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);  //Append mode
+        } catch (IOException e) {
+            // Nothing
+        }
     }
 
 }

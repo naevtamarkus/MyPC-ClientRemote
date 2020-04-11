@@ -20,6 +20,8 @@ package mypc.clientremote;
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 public class Config {
@@ -29,6 +31,7 @@ public class Config {
     // Config items:
     private final int port = 50505;
     private boolean debug = false;
+    private static String appName = "MyPCRemoteClient";
 
     public static Config getInstance() { 
         if (instance == null) instance = new Config(); 
@@ -36,7 +39,8 @@ public class Config {
     } 
 
     private Config() {
-        prefs = Preferences.userRoot().node(this.getClass().getName());
+        //prefs = Preferences.userRoot().node(this.getClass().getName());
+        prefs = Preferences.userRoot().node(appName);
     }
 
     public void setDebug(boolean val) { debug = val; }
@@ -56,5 +60,16 @@ public class Config {
     public String getKeyMap() { return prefs.get("KEYMAP", "DEFAULT"); }
 
     public int getPort() { return port; }
+
+    public static Path getDataPath() {
+        String OS = System.getProperty("os.name").toUpperCase();
+        if (OS.contains("WIN")) {
+            return Paths.get(System.getenv("AppData"), appName);
+        } else if (OS.contains("MAC")) {
+            return Paths.get(System.getProperty("user.home"),"Library", "Application Support", appName);
+        } else if (OS.contains("NUX")) {
+            return Paths.get(System.getProperty("user.home"), "."+appName);
+        } else return Paths.get(System.getProperty("user.dir"), appName);
+    }
 
 }
