@@ -84,7 +84,7 @@ public class FileEditWindow extends JFrame {
             reader = new FileReader(filePath.toFile());
             textArea.read(reader, null);
         } catch (IOException ex) {
-            textArea.setText("ERROR READING FILE");
+            textArea.setText("ERROR READING FILE: "+ ex.getMessage());
         } finally {
             if (reader != null) {
                 try {

@@ -42,6 +42,7 @@ import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Random;
 
 /* TODO LIST:
  * Improve installer: https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
@@ -88,11 +89,30 @@ public class ClientRemote {
         debug("Client started, waiting to die...");
         NetworkScanner.debugNetworks();
 
+        // Set up an auto-destroy mechanism (to prevent multiple instances running)
+        int random = new Random().nextInt(1000000);
+        Path checkFile = Config.getDataPath().resolve("instance.txt");
+        try {
+            Files.write(checkFile, String.valueOf(random).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);  //truncate old stuff
+        } catch (IOException e) {
+            debug("Could not create pid.txt file: "+e.getMessage());
+            return;
+        }
+
+        // Infinite loop to avoid leaving main()
         while (! exit_app) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(3000);
+                if (Integer.parseInt(Files.readAllLines(checkFile).get(0)) != random) {
+                    System.exit(0);
+                    debug("Exitting to prevent duplicate instances");
+                    return;
+                }
             } catch (InterruptedException e) {
                 // nothing
+            } catch (IOException e){
+                debug("Could not read pid.txt file: "+e.getMessage());
+                return;
             }
         }
         debug("Bye!");
