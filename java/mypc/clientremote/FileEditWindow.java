@@ -55,6 +55,7 @@ public class FileEditWindow extends JFrame {
             // nothing
         }
 
+        debug ("Creating FileEdit Window: "+filePath.toAbsolutePath());
         // Set window icon
         final ImageIcon icon = new ImageIcon(MYPC_ICON_BIG);
         setIconImage(icon.getImage());
