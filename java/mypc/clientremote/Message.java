@@ -20,6 +20,8 @@ package mypc.clientremote;
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import static mypc.clientremote.ClientRemote.debugException;
+
 public class Message {
     private String origMsg;
     private String firstWord;
@@ -44,6 +46,7 @@ public class Message {
                 this.isInfo = true;
             }
         } catch (Exception e) {
+            debugException(e);
             this.isError = true;
         }
     }

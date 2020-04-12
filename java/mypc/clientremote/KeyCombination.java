@@ -23,6 +23,8 @@ package mypc.clientremote;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
+import static mypc.clientremote.ClientRemote.debugException;
+
 // https://github.com/justin-taylor/Remote-Desktop-Server/blob/revert_to_old_state/src/AutoBot.java
 // https://stackoverflow.com/questions/14572270/how-can-i-perfectly-simulate-keyevents/14615814
 
@@ -66,7 +68,7 @@ public class KeyCombination {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    // Nothing
+                    debugException(e);
                 }
                 hitKeys(robot);
             }

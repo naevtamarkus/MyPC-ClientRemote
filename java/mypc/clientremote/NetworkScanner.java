@@ -36,6 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static mypc.clientremote.ClientRemote.debug;
+import static mypc.clientremote.ClientRemote.debugException;
 
 /*
     ##### USAGE EXAMPLE #####
@@ -158,7 +159,7 @@ class NetworkScanner {
                 this.ipsToScan.add(candidate);
             }
         } catch (Exception e) {
-            debug(e.getMessage());
+            debugException(e);
         }
     }
 
@@ -176,7 +177,7 @@ class NetworkScanner {
                 }
             }
         } catch (Exception e) {
-            debug(e.getMessage());
+            debugException(e);
         }
     }
 
@@ -267,7 +268,7 @@ class NetworkScanner {
             try { 
                 Thread.sleep(100); 
             } catch (Exception e) {
-                debug(e.getMessage());
+                debugException(e);
             }
         }
     }
@@ -327,7 +328,7 @@ class NetworkScanner {
                 output.add(item.get()); // This can throw a couple of exceptions
             } catch (Exception e) {
                 // If there was an error, just dump the result
-                debug(e.getMessage());
+                debugException(e);
             }
         }
         return output;
@@ -343,7 +344,7 @@ class NetworkScanner {
                 if (tmp.isHit()) output.add(tmp); // This can throw a couple of exceptions
             } catch (Exception e) {
                 // If there was an error, just dump the result
-                debug(e.getMessage());
+                debugException(e);
             }
         }
         return output;
@@ -388,7 +389,7 @@ class NetworkScanner {
                 }
             }
         } catch (Exception e) {
-            debug(e.getMessage());
+            debugException(e);
         }
     }
 }

@@ -83,6 +83,10 @@ public class ClientRemote {
         System.out.print(line);
     }
 
+    public static void debugException(Exception e) {
+        debug(e.toString() + Arrays.toString(e.getStackTrace()));
+    }
+
     public static void main(String[] args) {
         ClientRemote clientRemote = getInstance();
         // Keep the main loop active until the end

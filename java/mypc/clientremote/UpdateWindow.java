@@ -27,7 +27,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -35,7 +34,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -43,6 +41,7 @@ import dorkbox.util.Desktop;
 
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
+import static mypc.clientremote.ClientRemote.debugException;
 
 public class UpdateWindow extends JFrame {
     private final URL MYPC_ICON_NORMAL = getClass().getResource("/MyPC-icon_512x512.png");
@@ -71,7 +70,7 @@ public class UpdateWindow extends JFrame {
             //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (Exception e) {
-            // nothing
+            debugException(e);
         }
 
         // Set window icon
@@ -105,7 +104,7 @@ public class UpdateWindow extends JFrame {
                 try {
                     Desktop.browseURL(URL_WEBSITE);
                 } catch (IOException e1) {
-                    debug(Arrays.toString(e1.getStackTrace()));
+                    debugException(e1);
                 }
             }
         });

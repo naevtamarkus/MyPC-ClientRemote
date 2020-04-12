@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
+import static mypc.clientremote.ClientRemote.debugException;
 
 public class FileEditWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -52,7 +53,7 @@ public class FileEditWindow extends JFrame {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (final Exception e) {
-            // nothing
+            debugException(e);
         }
 
         debug ("Creating FileEdit Window: "+filePath.toAbsolutePath());
@@ -90,7 +91,8 @@ public class FileEditWindow extends JFrame {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException x) {
+                } catch (IOException e) {
+                    debugException(e);
                 }
             }
         }
@@ -115,7 +117,8 @@ public class FileEditWindow extends JFrame {
                         if (writer != null) {
                             try {
                                 writer.close();
-                            } catch (IOException x) {
+                            } catch (IOException e2) {
+                                debugException(e2);
                             }
                         }
                     }

@@ -46,6 +46,7 @@ import java.nio.file.Paths;
 import dorkbox.util.IO;
 
 import static mypc.clientremote.ClientRemote.debug;
+import static mypc.clientremote.ClientRemote.debugException;
 
 public class KeyMapCustom extends KeyMap {
     Map<Integer,KeyCombination> shortKeys;
@@ -73,7 +74,7 @@ public class KeyMapCustom extends KeyMap {
             }
             allLines = Files.readAllLines(configFile);
         } catch (IOException e) {
-            debug(e.getMessage());
+            debugException(e);
             return;
         }
         // Builds the default keymap
@@ -116,7 +117,7 @@ public class KeyMapCustom extends KeyMap {
             } catch (Exception e) {
                 // Just ignore the line if something is wrong
                 debug ("  exception handling line: "+line);
-                debug(e.getMessage());
+                debugException(e);
             }
         }
     }
@@ -248,7 +249,7 @@ public class KeyMapCustom extends KeyMap {
         try {
             Files.write(configFile, keymap.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);  //Append mode
         } catch (IOException e) {
-            // Nothing
+            debugException(e);
         }
     }
 

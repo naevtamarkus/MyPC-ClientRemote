@@ -47,6 +47,7 @@ import static mypc.clientremote.ClientRemote.EMAIL;
 import static mypc.clientremote.ClientRemote.URL_EMAIL;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
+import static mypc.clientremote.ClientRemote.debugException;
 
 public class ConfigWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -83,7 +84,7 @@ public class ConfigWindow extends JFrame {
             // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (final Exception e) {
-            // nothing
+            debugException(e);
         }
 
         // Set window icon
