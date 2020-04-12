@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.Random;
 
 import javax.swing.JPanel;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 
 /* TODO LIST:
@@ -110,9 +111,16 @@ public class ClientRemote {
         // Set look&feel for the whole app
         try {
             // Set the default OS's style
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //LookAndFeel laf = UIManager.getLookAndFeel();
+            //laf.getDefaults().put("Panel.background", new javax.swing.plaf.ColorUIResource(Color.blue));
+            //UIManager.setLookAndFeel(laf);
+            //UIManager.put("Panel.background", new javax.swing.plaf.ColorUIResource(Color.blue));
+            //UIManager.
+            //UIManager.put("Button.background", ((Color)UIManager.get("Button.background")).darker());
+            // Component codes: https://alvinalexander.com/java/java-uimanager-color-keys-list/?page=1
         } catch (final Exception e) {
             debugException(e);
         }
@@ -271,6 +279,7 @@ public class ClientRemote {
         })); // case does not matter
     }
 
+    /*
     public static class JWhitePanel extends JPanel {
         public JWhitePanel() {
             super();
@@ -281,5 +290,5 @@ public class ClientRemote {
             this.setBackground(Color.WHITE);
         }
     }
-
+    */
 }

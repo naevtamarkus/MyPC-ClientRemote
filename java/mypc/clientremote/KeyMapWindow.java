@@ -41,7 +41,6 @@ import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
-import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class KeyMapWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -70,21 +69,21 @@ public class KeyMapWindow extends JFrame {
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JWhitePanel();
+        final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JWhitePanel(new FlowLayout());
-        final JPanel panel2 = new JWhitePanel(new FlowLayout());
-        final JPanel panel3 = new JWhitePanel(new FlowLayout());
-        final JPanel remotePanel = new JWhitePanel(new FlowLayout());
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout());
+        final JPanel panel3 = new JPanel(new FlowLayout());
+        final JPanel remotePanel = new JPanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(panel3);
-        mainPanel.add(new JWhitePanel()); // separator
+        mainPanel.add(new JPanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JWhitePanel()); // separator
+        mainPanel.add(new JPanel()); // separator
         mainPanel.add(remotePanel);
 
         // Selection of KeyMap

@@ -47,7 +47,6 @@ import dorkbox.util.IO;
 
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
-import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class KeyMapCustom extends KeyMap {
     Map<Integer,KeyCombination> shortKeys;
@@ -135,13 +134,13 @@ public class KeyMapCustom extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JPanel mainPanel = new JWhitePanel();
+        JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JPanel panel1 = new JWhitePanel(new FlowLayout());
-        final JPanel panel2 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
-        final JPanel panel3 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
-        final JPanel panel4 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
-        final JPanel panel5 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(panel3);

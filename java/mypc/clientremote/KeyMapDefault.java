@@ -32,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.event.KeyEvent;
-import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class KeyMapDefault extends KeyMap {
     Map<Integer,KeyCombination> shortKeys;
@@ -103,10 +102,10 @@ public class KeyMapDefault extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JPanel mainPanel = new JWhitePanel();
+        JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JPanel panel1 = new JWhitePanel(new FlowLayout());
-        final JPanel panel2 = new JWhitePanel(new FlowLayout());
+        final JPanel panel1 = new JPanel(new FlowLayout());
+        final JPanel panel2 = new JPanel(new FlowLayout());
         //final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mainPanel.add(panel1);
         mainPanel.add(panel2);

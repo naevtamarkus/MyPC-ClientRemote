@@ -50,7 +50,6 @@ import static mypc.clientremote.ClientRemote.URL_EMAIL;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
-import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 
 public class ConfigWindow extends JFrame {
@@ -87,27 +86,27 @@ public class ConfigWindow extends JFrame {
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JWhitePanel();
+        final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel scanPanel = new JWhitePanel(new FlowLayout()); // for scan button
-        final JPanel ipPanel = new JWhitePanel(new FlowLayout()); // for IP textfield and test button
-        final JPanel msgPanel = new JWhitePanel(new FlowLayout()); // for scan status txt
-        final JPanel autoPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
-        final JPanel delayPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
-        final JPanel panelViewLogs = new JWhitePanel(new FlowLayout()); // Button to view debug logs
-        final JPanel mailtoPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for mailto link
-        final JPanel websitePanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for website link
+        final JPanel scanPanel = new JPanel(new FlowLayout()); // for scan button
+        final JPanel ipPanel = new JPanel(new FlowLayout()); // for IP textfield and test button
+        final JPanel msgPanel = new JPanel(new FlowLayout()); // for scan status txt
+        final JPanel autoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
+        final JPanel delayPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
+        final JPanel panelViewLogs = new JPanel(new FlowLayout()); // Button to view debug logs
+        final JPanel mailtoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for mailto link
+        final JPanel websitePanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for website link
         mainPanel.add(scanPanel);
         mainPanel.add(ipPanel);
         mainPanel.add(msgPanel);
         mainPanel.add(autoPanel);
         mainPanel.add(websitePanel);
-        mainPanel.add(new JWhitePanel()); // separator
+        mainPanel.add(new JPanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JWhitePanel()); // separator
+        mainPanel.add(new JPanel()); // separator
         mainPanel.add(panelViewLogs);
         mainPanel.add(mailtoPanel);
         mainPanel.add(delayPanel);

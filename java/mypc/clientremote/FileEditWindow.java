@@ -53,7 +53,6 @@ import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
-import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class FileEditWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -79,13 +78,13 @@ public class FileEditWindow extends JFrame {
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JWhitePanel();
+        final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
-        final JPanel panel2 = new JWhitePanel(new FlowLayout());
+        final JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel2 = new JPanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
 
