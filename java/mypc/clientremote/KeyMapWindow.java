@@ -21,6 +21,7 @@ package mypc.clientremote;
 */
 
 import java.awt.FlowLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -40,6 +41,7 @@ import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
+import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class KeyMapWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -63,35 +65,26 @@ public class KeyMapWindow extends JFrame {
 
     private KeyMapWindow() {
         isActive = true;
-        try {
-            // Set the default OS's style
-            // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (final Exception e) {
-            debugException(e);
-        }
-
         // Set window icon
         final ImageIcon icon = new ImageIcon(MYPC_ICON_BIG);
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JPanel();
+        final JPanel mainPanel = new JWhitePanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JPanel(new FlowLayout());
-        final JPanel panel2 = new JPanel(new FlowLayout());
-        final JPanel panel3 = new JPanel(new FlowLayout());
-        final JPanel remotePanel = new JPanel(new FlowLayout());
+        final JPanel panel1 = new JWhitePanel(new FlowLayout());
+        final JPanel panel2 = new JWhitePanel(new FlowLayout());
+        final JPanel panel3 = new JWhitePanel(new FlowLayout());
+        final JPanel remotePanel = new JWhitePanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
         mainPanel.add(panel3);
-        mainPanel.add(new JPanel()); // separator
+        mainPanel.add(new JWhitePanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JPanel()); // separator
+        mainPanel.add(new JWhitePanel()); // separator
         mainPanel.add(remotePanel);
 
         // Selection of KeyMap
@@ -99,7 +92,7 @@ public class KeyMapWindow extends JFrame {
         final JLabel labelIp = new JLabel("Select mapping: ");
         panel2.add(labelIp);
         String[] choices = { "DEFAULT", "CUSTOM"};
-        JComboBox<String> dropdown = new JComboBox<String>(choices);
+        JComboBox dropdown = new JComboBox(choices);
         panel2.add(dropdown);
 
         // Select configured mapping

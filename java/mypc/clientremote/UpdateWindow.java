@@ -42,6 +42,7 @@ import dorkbox.util.Desktop;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
+import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class UpdateWindow extends JFrame {
     private final URL MYPC_ICON_NORMAL = getClass().getResource("/MyPC-icon_512x512.png");
@@ -64,26 +65,17 @@ public class UpdateWindow extends JFrame {
 
     private UpdateWindow() {
         isActive = true;
-        try { 
-            // Set the default OS's style
-            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (Exception e) {
-            debugException(e);
-        }
-
         // Set window icon
         ImageIcon icon = new ImageIcon(MYPC_ICON_NORMAL);
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        JPanel mainPanel = new JPanel();
+        JPanel mainPanel = new JWhitePanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         setContentPane(mainPanel);
         // Add panels
-        JPanel panel1 = new JPanel(new FlowLayout());
-        JPanel panel2 = new JPanel(new FlowLayout());
+        JPanel panel1 = new JWhitePanel(new FlowLayout());
+        JPanel panel2 = new JWhitePanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
 

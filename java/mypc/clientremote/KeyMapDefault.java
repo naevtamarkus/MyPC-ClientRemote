@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import java.awt.event.KeyEvent;
+import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class KeyMapDefault extends KeyMap {
     Map<Integer,KeyCombination> shortKeys;
@@ -102,19 +103,19 @@ public class KeyMapDefault extends KeyMap {
 
     @Override
     public JPanel getInstructions() {
-        JPanel mainPanel = new JPanel();
+        JPanel mainPanel = new JWhitePanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JPanel panel1 = new JPanel(new FlowLayout());
-        final JPanel panel2 = new JPanel(new FlowLayout());
-        final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel1 = new JWhitePanel(new FlowLayout());
+        final JPanel panel2 = new JWhitePanel(new FlowLayout());
+        //final JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mainPanel.add(panel1);
         mainPanel.add(panel2);
-        mainPanel.add(panel3);
+        //mainPanel.add(panel3);
 
         // Panel 1
         String html1 = "<html><body>" +
-                "The Default Keymap defines a minimum mapping that should work for most TV's and PC's. <br><br> " +
-                "It is defined like this:<br></body></html>";
+                "The Default Keymap defines a minimum mapping that should work for most TV's and PC's. <br>" +
+                "</body></html>";
 
         String html2 = "<html><body>" +
                 "<h3>Quick Launch</h3>" +
@@ -141,8 +142,7 @@ public class KeyMapDefault extends KeyMap {
         panel2.add(imageLabel);
         panel2.add(new JLabel((html2)));
 
-        panel3.add(new JLabel("Currently, this KeyMap contains "+size()+" valid keys mapped. "));
-
+        //panel3.add(new JLabel("Currently, this KeyMap contains "+size()+" valid keys mapped. "));
         return mainPanel;
     }
 

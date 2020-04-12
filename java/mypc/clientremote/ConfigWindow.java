@@ -20,7 +20,9 @@ package mypc.clientremote;
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -48,6 +50,8 @@ import static mypc.clientremote.ClientRemote.URL_EMAIL;
 import static mypc.clientremote.ClientRemote.URL_WEBSITE;
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
+import static mypc.clientremote.ClientRemote.JWhitePanel;
+
 
 public class ConfigWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -78,59 +82,47 @@ public class ConfigWindow extends JFrame {
 
     private ConfigWindow() {
         isActive = true;
-        try {
-            // Set the default OS's style
-            // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (final Exception e) {
-            debugException(e);
-        }
-
         // Set window icon
         final ImageIcon icon = new ImageIcon(MYPC_ICON_BIG);
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JPanel();
+        final JPanel mainPanel = new JWhitePanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JPanel(new FlowLayout()); // for scan button
-        final JPanel panel2 = new JPanel(new FlowLayout()); // for IP textfield and test button
-        final JPanel panel3 = new JPanel(new FlowLayout()); // for scan status txt
-        final JPanel panel4 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
-        final JPanel panel5 = new JPanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
-        final JPanel panelViewLogs = new JPanel(new FlowLayout()); // Button to view debug logs
-        final JPanel panel6 = new JPanel(new FlowLayout()); // for mailto link
-        final JPanel panel7 = new JPanel(new FlowLayout()); // for websute link
-        mainPanel.add(panel1);
-        mainPanel.add(panel2);
-        mainPanel.add(panel3);
-        mainPanel.add(new JPanel()); // separator
+        final JPanel scanPanel = new JWhitePanel(new FlowLayout()); // for scan button
+        final JPanel ipPanel = new JWhitePanel(new FlowLayout()); // for IP textfield and test button
+        final JPanel msgPanel = new JWhitePanel(new FlowLayout()); // for scan status txt
+        final JPanel autoPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for connectOnStart checkbox
+        final JPanel delayPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for delayKeys checkbox
+        final JPanel panelViewLogs = new JWhitePanel(new FlowLayout()); // Button to view debug logs
+        final JPanel mailtoPanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for mailto link
+        final JPanel websitePanel = new JWhitePanel(new FlowLayout(FlowLayout.LEFT)); // for website link
+        mainPanel.add(scanPanel);
+        mainPanel.add(ipPanel);
+        mainPanel.add(msgPanel);
+        mainPanel.add(autoPanel);
+        mainPanel.add(websitePanel);
+        mainPanel.add(new JWhitePanel()); // separator
         mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(panel4);
-        mainPanel.add(panel5);
-        mainPanel.add(new JPanel()); // separator
-        mainPanel.add(new JSeparator()); // horizontal bar
-        mainPanel.add(new JPanel()); // separator
+        mainPanel.add(new JWhitePanel()); // separator
         mainPanel.add(panelViewLogs);
-        mainPanel.add(panel6);
-        mainPanel.add(panel7);
+        mainPanel.add(mailtoPanel);
+        mainPanel.add(delayPanel);
 
         // Network Scan button
         butScan = new JButton("Scan local network");
-        panel1.add(butScan);
+        scanPanel.add(butScan);
 
         // IP address setting & test button
         final JLabel labelIp = new JLabel("TV IP address: ");
-        panel2.add(labelIp);
+        ipPanel.add(labelIp);
         txtIp = new JTextField(15);
-        panel2.add(txtIp);
+        ipPanel.add(txtIp);
         butTest = new JButton("Set & Test");
-        panel2.add(butTest);
+        ipPanel.add(butTest);
 
         // Load configured IP address
         config = Config.getInstance();
@@ -166,11 +158,11 @@ public class ConfigWindow extends JFrame {
 
         // Status
         labelStatus = new JLabel(" ");
-        panel3.add(labelStatus);
+        msgPanel.add(labelStatus);
 
         // ConnectOnStart checkbox
         final JCheckBox cbAuto = new JCheckBox("Connect to TV automatically on Startup");
-        panel4.add(cbAuto);
+        autoPanel.add(cbAuto);
         cbAuto.setSelected(config.isConnectOnStart());
         cbAuto.addActionListener(new ActionListener() {
             @Override
@@ -181,7 +173,7 @@ public class ConfigWindow extends JFrame {
 
         // ConnectOnStart checkbox
         final JCheckBox cbDelay = new JCheckBox("Delay keystrokes (debug only)");
-        panel5.add(cbDelay);
+        delayPanel.add(cbDelay);
         cbDelay.setSelected(config.isDelayKeys());
         cbDelay.addActionListener(new ActionListener() {
             @Override
@@ -195,17 +187,17 @@ public class ConfigWindow extends JFrame {
         butViewLogs.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                FileEditWindow.display(DEBUGFILEPATH, "Debug log",false);
+                FileEditWindow.display(DEBUGFILEPATH, "Debug log",false, true);
             }
         });
 
 
 
-        panel6.add(new JLabel("Send feedback to: "));
-        panel6.add(new JHyperlink(EMAIL, URL_EMAIL));
+        mailtoPanel.add(new JLabel("Send feedback to: "));
+        mailtoPanel.add(new JHyperlink(EMAIL, URL_EMAIL));
 
-        panel7.add(new JLabel("MyPC App website: "));
-        panel7.add(new JHyperlink(URL_WEBSITE, URL_WEBSITE));
+        websitePanel.add(new JLabel("MyPC App website: "));
+        websitePanel.add(new JHyperlink(URL_WEBSITE, URL_WEBSITE));
 
         // Allow the window to close (without closing the app)
         // setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

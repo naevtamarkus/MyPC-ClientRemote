@@ -25,6 +25,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -51,6 +53,7 @@ import javax.swing.UIManager;
 
 import static mypc.clientremote.ClientRemote.debug;
 import static mypc.clientremote.ClientRemote.debugException;
+import static mypc.clientremote.ClientRemote.JWhitePanel;
 
 public class FileEditWindow extends JFrame {
     private final URL MYPC_ICON_BIG = getClass().getResource("/MyPC-icon_512x512.png");
@@ -58,37 +61,31 @@ public class FileEditWindow extends JFrame {
     private static FileEditWindow currentWindow;
 
     // Windows should go into separate threads
-    public static void display(Path filePath, String windowName, boolean canSave) {
+    public static void display(Path filePath, String windowName, boolean canSave, boolean scrollDown) {
         if (isActive) return;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                currentWindow = new FileEditWindow(filePath, windowName, canSave); // Let the constructor do the job
+                currentWindow = new FileEditWindow(filePath, windowName, canSave, scrollDown); // Let the constructor do the job
             }
         });
     }
 
-    private FileEditWindow(Path filePath, String windowName, boolean canSave) {
+    private FileEditWindow(Path filePath, String windowName, boolean canSave, boolean scrollDown) {
         isActive = true;
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        } catch (final Exception e) {
-            debugException(e);
-        }
-
         debug ("Creating FileEdit Window: "+filePath.toAbsolutePath());
         // Set window icon
         final ImageIcon icon = new ImageIcon(MYPC_ICON_BIG);
         setIconImage(icon.getImage());
 
         // The "main" JPanel holds all the GUI components
-        final JPanel mainPanel = new JPanel();
+        final JPanel mainPanel = new JWhitePanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         setContentPane(mainPanel);
         // Add panels
-        final JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        final JPanel panel2 = new JPanel(new FlowLayout());
+        final JPanel panel1 = new JWhitePanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel panel2 = new JWhitePanel(new FlowLayout());
         mainPanel.add(panel1);
         mainPanel.add(panel2);
 
@@ -98,6 +95,14 @@ public class FileEditWindow extends JFrame {
         textArea.setEditable ( canSave );
         JScrollPane scroll = new JScrollPane ( textArea );
         scroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+        if (scrollDown) {
+            scroll.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+                public void adjustmentValueChanged(AdjustmentEvent e) {
+                    e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+                }
+            });
+        }
+
         panel2.add(scroll);
         //panel2.add(textArea, BorderLayout.CENTER);
         // Read the contents

@@ -27,6 +27,8 @@ import dorkbox.systemTray.Separator;
 import dorkbox.util.Desktop;
 import mypc.clientremote.ConnectionService.Status;
 
+import java.awt.Color;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -44,10 +46,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
 /* TODO LIST:
  * Improve installer: https://stackoverflow.com/questions/1276091/installer-generator-written-in-java
  *   or even get rid of it and use only .appx methods
- * Improve look & feel to resemble a modern application (check UIManager.setLookAndFeel())
  * Cache the IP address in the Config object (e.g. can also apply to other config items)
  * Handle ConnectionService ERROR state properly (e.g. unrecoverable error?)
  * Improve error-handling of the ConnectionService
@@ -102,6 +106,17 @@ public class ClientRemote {
             debug("Could not create pid.txt file: "+e.getMessage());
             return;
         }
+
+        // Set look&feel for the whole app
+        try {
+            // Set the default OS's style
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (final Exception e) {
+            debugException(e);
+        }
+
 
         // Infinite loop to avoid leaving main()
         while (! exit_app) {
@@ -255,4 +270,16 @@ public class ClientRemote {
             }
         })); // case does not matter
     }
+
+    public static class JWhitePanel extends JPanel {
+        public JWhitePanel() {
+            super();
+            this.setBackground(Color.WHITE);
+        }
+        public JWhitePanel(LayoutManager layout){
+            super(layout);
+            this.setBackground(Color.WHITE);
+        }
+    }
+
 }
