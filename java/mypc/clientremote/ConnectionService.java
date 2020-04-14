@@ -128,7 +128,7 @@ public class ConnectionService {
                     // Loop again and again to connect
                     try {
                         if (!retrying) debug("ConnectionService: client connecting to server");
-                        Socket s = new Socket(config.getIpAddress(), config.getPort());
+                        Socket socket = new Socket(config.getIpAddress(), config.getPort());
                         //outgoing stream redirect to socket
                         //OutputStream out = s.getOutputStream();
                         //PrintWriter output = new PrintWriter(out);
@@ -136,22 +136,27 @@ public class ConnectionService {
                         retrying = false; // we went through, we enable logging
                         status = Status.CONNECTED;
                         if (connectionChangeEvent != null) connectionChangeEvent.onConnectionChanged();
-                        BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        KeepAliveThread kat = new KeepAliveThread(socket);
+                        kat.start();
+                        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                             
                         debug("ConnectionService: client connected and waiting for messages");
                         while (! disconnectNow && ! Thread.currentThread().isInterrupted()) {
                             //read line(s)
-                            String st = input.readLine();
-                            if (st == null) throw new IOException("received null value!"); // TODO we get this when disconnected, better handle in a better way?
-                            debug("ConnectionService: client received msg from server: "+st);
+                            String msg = input.readLine();
+                            if (msg == null) throw new ConnectException("Server disconnected"); // This is a disconnect msg
+                            // Before processing the message, check that's not a keep-alive
+                            if (msg.equals("")) continue;
+                            // Now we process messages
+                            debug("ConnectionService: client received msg from server: "+msg);
                             // Send to listener, if any
                             if (messageReceivedEvent != null) {
                                 debug ("  redirecting message to event listener");
-                                messageReceivedEvent.onMessageReceived(st);
+                                messageReceivedEvent.onMessageReceived(msg);
                                 // Don't process message anymore
                                 continue;
                             }
-                            Message message = new Message(st);
+                            Message message = new Message(msg);
                             if (message.isKey()) {
                                 processKey(message.getKeyType(), message.getKeyCode());
                             } else if (message.isInfo()) {
@@ -162,7 +167,7 @@ public class ConnectionService {
                         }
                         //Close connection 
                         debug("ConnectionService: client disconnected");
-                        s.close();
+                        socket.close();
                         
 
                     } catch (UnknownHostException e) {
